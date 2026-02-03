@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 class Anchor{
@@ -137,12 +138,12 @@ private:
 
         if(asse%2==0){
             sort(p.begin(),p.end(),
-            [](const  KDpoint* a,const KDpoint* b){return a->getX<b->getX;});
+            [](const  KDpoint* a,const KDpoint* b){return a->getX()<b->getX();});
         }
         else{
             
             sort(p.begin(),p.end(),
-            [](const  KDpoint* a,const KDpoint* b){return a->getY<b->getY;});
+            [](const  KDpoint* a,const KDpoint* b){return a->getY()<b->getY();});
         }
 
         int valMedio=p.size()/2;
@@ -199,6 +200,33 @@ private:
     }
     ////////////////////////////////
     //////////////////////////////
+
+
+    //stampa tree
+
+    void printGraph(KDnode* node, int depth){
+
+    if (!node) return;
+
+    printGraph(node->getRight(), depth+1);
+
+    for (int i = 0; i < depth; i++)
+        cout << "    ";
+    
+    KDpoint * p=node->getPoint();
+
+    cout << p->getX() << " , " << p->getY() ;
+    
+    if (node->getAsse() == 0)
+        cout << " (X)";
+    else
+        cout << " (Y)";
+
+    cout << "\n";
+
+    printGraph(node->getLeft(),depth+1);
+    
+}
     
 public : 
     KDtree(vector <KDpoint*>& points){
@@ -219,22 +247,84 @@ public :
     }
 
     KDnode* getRoot() { return root;}
+
+    void printAlbero() {printGraph(root, 0);}
 };
 
 
- int main(){
+/// un estrapolamento dei punti dalle anchor(p.ti begin e end) da usare nello scorrimento della linee sweep
+/// per verificare se trattasi di punti begin o end.
+struct pointLineeSweep{
 
-    vector <KDpoint> points;
-    vector <Anchor> anchors;
-    for(int i=0;i<anchors.size();i++){
+    int x,y;
+    bool isBegin;
+    int id;
 
-        points.emplace_back(
-        points[i]=anchors[i].getXend();
-        points[i]=anchors[i].getYend();
-        i;
-        anchors[i].getWeight;
-        )
+};
 
+int main() {
+
+    
+   
+    /*cout << "\n inserisci numero frammenti : ";
+    cin >> n;
+    for (int i = 0; i < n; i++) {
+
+    int xb, yb, xe, ye, w;
+
+    cout << "\nFrammento " << i + 1 << ":\n";
+
+    cout << "Inserire x begin: ";
+    cin >> xb;
+
+    cout << "Inserire y begin: ";
+    cin >> yb;
+
+    cout << "Inserire x end: ";
+    cin >> xe;
+
+    cout << "Inserire y end: ";
+    cin >> ye;
+
+    cout << "Inserire peso: ";
+    cin >> w;
+
+    anchors.emplace_back(xb, yb, xe, ye, w);
+}*/
+
+    vector<Anchor> anchors = {
+
+    Anchor(1, 1, 4, 4, 5),
+    Anchor(2, 2, 6, 5, 3),
+    Anchor(5, 3, 8, 7, 4),
+    Anchor(7, 1, 9, 4, 6),
+    Anchor(5, 6, 6, 8, 10),
+    Anchor(1, 3, 3, 5, 5)
+
+};
+    int n=anchors.size();
+
+
+
+    ///creo KDPoints, i punti con solo gli end.
+
+    vector<KDpoint*> kdpoints;
+
+    for (int i=0;i<n;i++){
+
+        kdpoints.push_back(
+
+            new KDpoint(
+                anchors[i].getXend(),
+                anchors[i].getYend(),
+                i,
+                anchors[i].getWeight()
+            )
+        );
     }
+
+    KDtree tree(kdpoints);
+
+    tree.printAlbero();
 
 }
