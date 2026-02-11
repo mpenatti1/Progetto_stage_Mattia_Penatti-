@@ -2,7 +2,9 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <unordered_map>
 using namespace std;
+
 
 class Anchor{
     
@@ -10,9 +12,13 @@ class Anchor{
     int x_begin,y_begin;
     int x_end,y_end;
     int weight;
+    int score;
+    int prec;
 
     public :
+        Anchor() : x_begin(0), y_begin(0), x_end(0), y_end(0), weight(0) {}
         Anchor(int xb,int yb,int xe,int ye,int w){
+            
             x_begin=xb;
             x_end=xe;
             y_begin=yb;
@@ -25,6 +31,10 @@ class Anchor{
         int getYbegin() {return y_begin;}
         int getYend() {return y_end;}
         int getWeight() {return weight;}
+        int getScore() {return score;}
+        int getPrec(){return prec;}
+        void setPrec(int p){prec=p;}
+        void setScore(int s){score=weight+s;}
 
 };
 
@@ -34,29 +44,25 @@ class KDpoint {
 private:
     int x,y;
     int id;
-    int weight;
-    int score;
     int gc;
     int priority;
 
 public:
 
-    KDpoint(int xe,int ye,int id,int w)
-        : x(xe), y(ye), id(id), weight(w),
-          score(0), gc(0), priority(0) {}
+    KDpoint(int xe,int ye,int id)
+        : x(xe), y(ye), id(id), 
+           gc(0), priority(0) {}
 
     int getX() const { return x; }
     int getY() const { return y; }
 
-    void setScore(int s) {
-        score = s + weight;
-    }
+  
 
     void setGc(int xb, int yb) {
         gc = (xb - x) + (yb - y);
     }
 
-    void computePriority() {
+    void setPriority(int score) {
         priority = score - gc;
     }
 
@@ -125,15 +131,18 @@ class KDtree{
 private: 
 
     KDnode* root;
-
+    unordered_map<KDpoint*, KDnode*> pointToNode;
     ///metodo creazione albero
 
     KDnode * buildTree(vector<KDpoint*>&p, int depth){
 
         if(p.empty()) return nullptr;
-        if(p.size()==1)
-            return new KDnode(p[0],depth%2);
-        
+        if(p.size()==1){
+
+            KDnode* node = new KDnode(p[0], depth % 2);
+            pointToNode[p[0]] = node;
+            return node;
+        }
         int asse=depth%2;   
 
         if(asse%2==0){
@@ -153,6 +162,8 @@ private:
         vector <KDpoint*> p2(p.begin()+valMedio+1,p.end());
 
         KDnode* node= new KDnode(ptMedio,asse);
+
+        pointToNode[ptMedio] = node;
 
         node->setLeft(buildTree(p1,depth+1));
         node->setRight(buildTree(p2,depth+1));
@@ -249,6 +260,13 @@ public :
     KDnode* getRoot() { return root;}
 
     void printAlbero() {printGraph(root, 0);}
+
+    void activatePoint(KDpoint* p) {
+        auto it = pointToNode.find(p);
+        if (it != pointToNode.end()) {
+            it->second->activate();
+        }
+    }
 };
 
 
@@ -262,69 +280,164 @@ struct pointLineeSweep{
 
 };
 
+void printChainRec(Anchor & a, unordered_map<int, Anchor>& anchors) {
+    if(a.getPrec() == -1){
+        cout << a.getPrec() << " ";  // o niente se vuoi ignorare -1
+        return;
+    }
+    printChainRec(anchors.at(a.getPrec()), anchors); // vai al precedente
+    cout << a.getPrec() << " ";
+}
+
 int main() {
 
-    
-   
-    /*cout << "\n inserisci numero frammenti : ";
-    cin >> n;
-    for (int i = 0; i < n; i++) {
 
-    int xb, yb, xe, ye, w;
+    struct InputAnchor {
+        int id, xb, yb, xe, ye, w;
+    };
 
-    cout << "\nFrammento " << i + 1 << ":\n";
+    vector<InputAnchor> data = {
+        {101, 1,1,4,4,5},
+        {205, 2,2,6,5,3},
+        {77,  5,3,15,7,4},
+        {10, 10, 15, 20, 25,6},
+        {13, 25,30, 40, 35,8},
+        {29, 13, 18, 17, 19,7},
+        {21, 7, 10, 10, 12 ,13}
+    };
 
-    cout << "Inserire x begin: ";
-    cin >> xb;
+    unordered_map<int, Anchor> anchors;
+    int max_x = 0;
+    int max_y = 0;
+    for (auto& d : data) {
 
-    cout << "Inserire y begin: ";
-    cin >> yb;
+        anchors[d.id] =
+            Anchor(d.xb, d.yb, d.xe, d.ye, d.w);
 
-    cout << "Inserire x end: ";
-    cin >> xe;
+            max_x = std::max(max_x, d.xe);
+            max_y = std::max(max_y, d.ye);
+    }
 
-    cout << "Inserire y end: ";
-    cin >> ye;
+    //ancora begin
+      
+    anchors[-1] = Anchor(0, 0, 0, 0, 0);
 
-    cout << "Inserire peso: ";
-    cin >> w;
-
-    anchors.emplace_back(xb, yb, xe, ye, w);
-}*/
-
-    vector<Anchor> anchors = {
-
-    Anchor(1, 1, 4, 4, 5),
-    Anchor(2, 2, 6, 5, 3),
-    Anchor(5, 3, 8, 7, 4),
-    Anchor(7, 1, 9, 4, 6),
-    Anchor(5, 6, 6, 8, 10),
-    Anchor(1, 3, 3, 5, 5)
-
-};
-    int n=anchors.size();
-
-
+    //ancora end
+        
+    anchors[-2] = Anchor(max_x + 1, max_y + 1,
+                            max_x + 1, max_y + 1,
+                            0);
 
     ///creo KDPoints, i punti con solo gli end.
 
+    unordered_map<int, KDpoint *> IdKdPoints;
     vector<KDpoint*> kdpoints;
 
-    for (int i=0;i<n;i++){
+    for (auto& [id,a] : anchors){
 
-        kdpoints.push_back(
-
-            new KDpoint(
-                anchors[i].getXend(),
-                anchors[i].getYend(),
-                i,
-                anchors[i].getWeight()
-            )
+        KDpoint * kd =new KDpoint(
+                a.getXend(),
+                a.getYend(),
+                id
         );
+        kdpoints.push_back(kd);
+        IdKdPoints[id]=kd;
     }
+
+    ///costruisco kdtree
 
     KDtree tree(kdpoints);
 
     tree.printAlbero();
+
+    ///creo vettore di pti begin end ordinati per line sweep
+
+    vector <pointLineeSweep> pti;
+    
+    
+        
+    
+    for(auto & [id,a] : anchors){
+
+        //begin
+        pti.push_back(
+
+            {a.getXbegin(),
+            a.getYbegin(),
+            true,
+            id
+        });
+        
+        //end
+        pti.push_back({
+            a.getXend(),
+            a.getYend(),
+            false,
+            id
+        });
+    }
+    /*pointLineeSweep t=pti.back();
+    pti.insert(pti.begin(), pointLineeSweep({0,0,false, 0}));
+    pti.insert(pti.end(),pointLineeSweep({t.x+1, t.y+1, true, t.id +1}));*/
+    
+    //ordino per le x
+
+    sort(pti.begin(),pti.end(),
+        [](const pointLineeSweep& a, const pointLineeSweep& b){
+            return a.x<b.x;
+        });
+
+    //sweep line
+    int n=pti.size();
+
+    /*testare se va
+    for(int i=0;i<n;i++){
+
+        printf("tipo :%d x : %d,y :%d",pti[i].isBegin,pti[i].x,pti[i].y);
+    }*/
+
+    
+    for(int i=0;i< n; i++){
+
+        int idSelected= pti.at(i).id;
+        Anchor& curr = anchors.at(idSelected);
+
+        if(pti.at(i).isBegin){
+            
+            KDpoint* p = tree.rmq(pti.at(i).x,pti.at(i).y);
+
+            if (p != nullptr) {
+                int idPrec = p->getId();
+                Anchor& prev = anchors.at(idPrec);
+
+                curr.setPrec(idPrec);
+                curr.setScore(prev.getScore());
+            }
+            else {
+                curr.setPrec(-1);
+                curr.setScore(0);
+            }
+            
+
+
+        }
+        else if(!pti.at(i).isBegin){
+
+            KDpoint * kd= IdKdPoints[idSelected];
+            kd->setGc(pti[n-1].x, pti[n-1].y);
+            kd->setPriority(curr.getScore());
+            tree.activatePoint(kd);  
+            
+        }
+
+
+    }
+    
+    printf("%d",anchors.at(-2).getPrec()); 
+    printf("\n");
+    
+    printChainRec(anchors.at(-2), anchors);
+    printf("\n");
+
 
 }

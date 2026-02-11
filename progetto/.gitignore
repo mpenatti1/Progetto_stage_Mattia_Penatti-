@@ -1,0 +1,14 @@
+# Eseguibili
+progetto
+*.out
+
+# File temporanei di compilazione
+*.o
+*.obj
+
+# Cartelle di IDE/editor
+.vscode/
+.idea/
+
+# Altri file temporanei
+*~
