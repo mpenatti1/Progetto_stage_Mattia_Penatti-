@@ -376,9 +376,7 @@ int main() {
             id
         });
     }
-    /*pointLineeSweep t=pti.back();
-    pti.insert(pti.begin(), pointLineeSweep({0,0,false, 0}));
-    pti.insert(pti.end(),pointLineeSweep({t.x+1, t.y+1, true, t.id +1}));*/
+
     
     //ordino per le x
 
@@ -389,13 +387,6 @@ int main() {
 
     //sweep line
     int n=pti.size();
-
-    /*testare se va
-    for(int i=0;i<n;i++){
-
-        printf("tipo :%d x : %d,y :%d",pti[i].isBegin,pti[i].x,pti[i].y);
-    }*/
-
     
     for(int i=0;i< n; i++){
 
@@ -439,5 +430,5 @@ int main() {
     printChainRec(anchors.at(-2), anchors);
     printf("\n");
 
-
+    // test per la commit
 }
