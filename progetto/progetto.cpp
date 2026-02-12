@@ -131,7 +131,9 @@ class KDtree{
 private: 
 
     KDnode* root;
-    unordered_map<KDpoint*, KDnode*> pointToNode;
+    /*uso hashmap per tenere traccia dei kdnode per essere attivati, 
+    altrimenti dal ciclo nella sweep line, che funziona sui kdpoints, non posso trovare il kdnode associato*/
+    unordered_map<KDpoint*, KDnode*> pointToNode; 
     ///metodo creazione albero
 
     KDnode * buildTree(vector<KDpoint*>&p, int depth){
@@ -262,9 +264,9 @@ public :
     void printAlbero() {printGraph(root, 0);}
 
     void activatePoint(KDpoint* p) {
-        auto it = pointToNode.find(p);
+        auto it = pointToNode.find(p);//mi trova la coppia KdPoint e KdNode
         if (it != pointToNode.end()) {
-            it->second->activate();
+            it->second->activate();     //attivo il kdnode
         }
     }
 };
@@ -340,8 +342,8 @@ int main() {
                 a.getYend(),
                 id
         );
-        kdpoints.push_back(kd);
-        IdKdPoints[id]=kd;
+        kdpoints.push_back(kd); //vettore kdpoints per costruzione albero
+        IdKdPoints[id]=kd; //hashmap kdpoints per tracciare id
     }
 
     ///costruisco kdtree
