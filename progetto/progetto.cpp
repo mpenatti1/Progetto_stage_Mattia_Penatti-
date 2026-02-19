@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
+#include <fstream>
 using namespace std;
 
 
@@ -24,6 +25,8 @@ class Anchor{
             y_begin=yb;
             y_end=ye;
             weight=w; 
+            score=0;
+            prec=-1;
         }
             
         int getXbegin() { return  x_begin; }
@@ -49,8 +52,8 @@ private:
 
 public:
 
-    KDpoint(int xe,int ye,int id)
-        : x(xe), y(ye), id(id), 
+    KDpoint(int xe,int ye,int i)
+        : x(xe), y(ye), id(i),
            gc(0), priority(0) {}
 
     int getX() const { return x; }
@@ -282,69 +285,103 @@ struct pointLineeSweep{
 
 };
 
-void printChainRec(Anchor & a, unordered_map<int, Anchor>& anchors) {
+
+//funzione stampa chain
+
+void printChainRec(Anchor & a, vector<Anchor> anchors) {
     if(a.getPrec() == -1){
         cout << a.getPrec() << " ";  // o niente se vuoi ignorare -1
         return;
     }
-    printChainRec(anchors.at(a.getPrec()), anchors); // vai al precedente
+    printChainRec(anchors.at(a.getPrec()),anchors); // vai al precedente
     cout << a.getPrec() << " ";
 }
 
-int main() {
+//funzione lettura file
 
+vector <Anchor> fileReading(const string& filename, int &max_x, int & max_y){
 
-    struct InputAnchor {
-        int id, xb, yb, xe, ye, w;
-    };
-
-    vector<InputAnchor> data = {
-        {101, 1,1,4,4,5},
-        {205, 2,2,6,5,3},
-        {77,  5,3,15,7,4},
-        {10, 10, 15, 20, 25,6},
-        {13, 25,30, 40, 35,8},
-        {29, 13, 18, 17, 19,7},
-        {21, 7, 10, 10, 12 ,13}
-    };
-
-    unordered_map<int, Anchor> anchors;
-    int max_x = 0;
-    int max_y = 0;
-    for (auto& d : data) {
-
-        anchors[d.id] =
-            Anchor(d.xb, d.yb, d.xe, d.ye, d.w);
-
-            max_x = std::max(max_x, d.xe);
-            max_y = std::max(max_y, d.ye);
+    ifstream fin(filename);
+    if (!fin)
+    {
+        throw runtime_error("errore apertura file");
     }
 
+    vector <Anchor> anchors;
+    max_x=0;
+    max_y=0;
+
+    int xb,yb,xe,ye,w;
+
+    while(fin >> xb >> yb >> xe >> ye >> w){
+
+        anchors.emplace_back(xb,yb,xe,ye,w);
+        if (xe > max_x) max_x = xe;
+        if (ye > max_y) max_y = ye;
+    }
     //ancora begin
       
-    anchors[-1] = Anchor(0, 0, 0, 0, 0);
+    anchors.insert(anchors.begin(), Anchor(0,0,0,0,0));
 
     //ancora end
         
-    anchors[-2] = Anchor(max_x + 1, max_y + 1,
+    anchors.insert(anchors.end(),Anchor(max_x+ 1, max_y + 1,
                             max_x + 1, max_y + 1,
-                            0);
+                            0) );
+    
+    fin.close();
+
+    return anchors;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+int main(int argc, char* argv[]) {
+
+
+    if (argc < 2){
+        cout << "uso : "<< argv[0] << "file.txt\n";
+        return 1;
+    }
+
+    int max_x,max_y;
+
+    vector <Anchor> anchors = fileReading(argv[1], max_x, max_y);
+    
+    cout << "\nStampo ancore lette:\n";
+    for (int i = 0; i < anchors.size(); i++) {
+        cout << i << ": (" 
+         << anchors[i].getXbegin() << "," << anchors[i].getYbegin() << ") -> ("
+         << anchors[i].getXend() << "," << anchors[i].getYend() << "), weight: "
+         << anchors[i].getWeight() << "\n";
+}
 
     ///creo KDPoints, i punti con solo gli end.
 
-    unordered_map<int, KDpoint *> IdKdPoints;
-    vector<KDpoint*> kdpoints;
 
-    for (auto& [id,a] : anchors){
+
+    int n=anchors.size();
+    vector<KDpoint*> kdpoints;
+    
+    for (int i=0;i<n;i++){
 
         KDpoint * kd =new KDpoint(
-                a.getXend(),
-                a.getYend(),
-                id
+                
+                anchors[i].getXend(),
+                anchors[i].getYend(),
+                i
+                
         );
         kdpoints.push_back(kd); //vettore kdpoints per costruzione albero
-        IdKdPoints[id]=kd; //hashmap kdpoints per tracciare id
+        
     }
+    cout << "KDPoints (x_end, y_end) prima del buildTree:\n";
+    for (int i = 0; i < kdpoints.size(); i++) {
+        cout << i << " -> (" << kdpoints[i]->getX() 
+         << "," << kdpoints[i]->getY() << ")\n";
+}
 
     ///costruisco kdtree
 
@@ -359,66 +396,65 @@ int main() {
     
         
     
-    for(auto & [id,a] : anchors){
+    for(int i=0;i<n;i++){
 
         //begin
         pti.push_back(
 
-            {a.getXbegin(),
-            a.getYbegin(),
+            {anchors[i].getXbegin(),
+            anchors[i].getYbegin(),
             true,
-            id
+            i
         });
         
         //end
         pti.push_back({
-            a.getXend(),
-            a.getYend(),
+            anchors[i].getXend(),
+            anchors[i].getYend(),
             false,
-            id
+            i
         });
     }
 
     
     //ordino per le x
 
-    sort(pti.begin(),pti.end(),
-        [](const pointLineeSweep& a, const pointLineeSweep& b){
-            return a.x<b.x;
-        });
+    sort(pti.begin(), pti.end(),
+    [](const pointLineeSweep& a, const pointLineeSweep& b){
+        if (a.x != b.x) return a.x < b.x;
+        return a.isBegin < b.isBegin; 
+        // false (end) prima di true (begin)
+    });
 
     //sweep line
-    int n=pti.size();
+    int n_pti=pti.size();
     
-    for(int i=0;i< n; i++){
+    for(int i=0;i< n_pti; i++){
 
-        int idSelected= pti.at(i).id;
-        Anchor& curr = anchors.at(idSelected);
+        int idcurr = pti[i].id;
 
         if(pti.at(i).isBegin){
             
+
             KDpoint* p = tree.rmq(pti.at(i).x,pti.at(i).y);
 
-            if (p != nullptr) {
+            if(p != nullptr && p->getId() != idcurr) {
                 int idPrec = p->getId();
-                Anchor& prev = anchors.at(idPrec);
-
-                curr.setPrec(idPrec);
-                curr.setScore(prev.getScore());
+                Anchor &prev = anchors[idPrec];
+                anchors[idcurr].setPrec(idPrec);            //gapcost
+                anchors[idcurr].setScore(prev.getScore()); //-((anchors[idcurr].getXbegin()-anchors[idPrec].getXend())+(anchors[idcurr].getYbegin()-anchors[idPrec].getYend())));
             }
             else {
-                curr.setPrec(-1);
-                curr.setScore(0);
+                anchors[idcurr].setPrec(-1);
+                anchors[idcurr].setScore(0);
             }
             
-
-
         }
         else if(!pti.at(i).isBegin){
 
-            KDpoint * kd= IdKdPoints[idSelected];
-            kd->setGc(pti[n-1].x, pti[n-1].y);
-            kd->setPriority(curr.getScore());
+            KDpoint * kd= kdpoints[idcurr];
+            kd->setGc(pti[n_pti-1].x, pti[n_pti-1].y);
+            kd->setPriority(anchors[idcurr].getScore());
             tree.activatePoint(kd);  
             
         }
@@ -426,11 +462,16 @@ int main() {
 
     }
     
-    printf("%d",anchors.at(-2).getPrec()); 
-    printf("\n");
+    cout << "valori precedent:\n";
+    for (int i = 0; i < anchors.size(); i++) {
+        cout << i << " -> " << anchors[i].getPrec() << endl;
+    }
     
-    printChainRec(anchors.at(-2), anchors);
+    cout << "catena più lunga :\n ";
+    printChainRec(anchors.back(), anchors);
     printf("\n");
+    cout << "score : ";
+    printf("%d\n",anchors.back().getScore());
 
-    // test per la commit
+
 }
