@@ -6,6 +6,8 @@ progetto
 *.o
 *.obj
 
+
+
 # Cartelle di IDE/editor
 .vscode/
 .idea/
