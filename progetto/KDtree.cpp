@@ -4,7 +4,6 @@
 #include "Range.h"
 #include <vector>
 #include <algorithm>
-#include <iostream>
 #include <unordered_map>
 #include <iostream>
 
@@ -51,13 +50,12 @@ void KDtree::rmqRec(KDnode* node,  Range& R, KDpoint*& best) {
         return;
 
     KDpoint* p = node->getPoint();
-    /*std::cout << "Visiting node: (" << p->getX() << ", " << p->getY() << ") with priority " << p->getPriority() << "\n" << node->isActive() << "\n";
-    std::cout << "nodo è attivo? : " << node->isActive() << "\n" << "range contiene punto? : " << R.contains(p) << "\n";*/
+
     if (node->isActive() && R.contains(p)) {
         
         if (!best || p->getPriority() > best->getPriority()) {
             best = p;
-            //std::cout << "New best point: (" << best->getX() << ", " << best->getY() << ") with priority " << best->getPriority() << "\n";
+            
         }
     }
 
@@ -94,7 +92,7 @@ void KDtree::printGraph(KDnode* node, int depth) {
 }
 
 ///////////public
-KDtree::KDtree(std::vector<KDpoint*>& points) {
+KDtree::KDtree(std::vector<KDpoint*> points) {
     root = buildTree(points, 0);
 }
 KDpoint * KDtree::rmq(int xmax, int ymax) {

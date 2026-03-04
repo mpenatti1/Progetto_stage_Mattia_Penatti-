@@ -52,15 +52,17 @@ vector <Anchor> fileReading(const string& filename, int &max_x, int & max_y){
 
     int xb,yb,xe,ye,w;
 
+    //ancora begin
+      
+    anchors.insert(anchors.begin(), Anchor(0,0,0,0,0));
+
     while(fin >> xb >> yb >> xe >> ye >> w){
 
         anchors.emplace_back(xb,yb,xe,ye,w);
         if (xe > max_x) max_x = xe;
         if (ye > max_y) max_y = ye;
     }
-    //ancora begin
-      
-    anchors.insert(anchors.begin(), Anchor(0,0,0,0,0));
+    
 
     //ancora end
         
@@ -79,6 +81,7 @@ vector <Anchor> fileReading(const string& filename, int &max_x, int & max_y){
 
 int main(int argc, char* argv[]) {
 
+    
 
     if (argc < 2){
         cout << "uso : "<< argv[0] << "file.txt\n";
@@ -89,13 +92,15 @@ int main(int argc, char* argv[]) {
 
     vector <Anchor> anchors = fileReading(argv[1], max_x, max_y);
     
+    #ifndef NDEBUG
     cout << "\nStampo ancore lette:\n";
     for (int i = 0; i < anchors.size(); i++) {
         cout << i << ": (" 
          << anchors[i].getXbegin() << "," << anchors[i].getYbegin() << ") -> ("
          << anchors[i].getXend() << "," << anchors[i].getYend() << "), weight: "
          << anchors[i].getWeight() << "\n";
-}
+    } 
+    #endif
 
     ///creo KDPoints, i punti con solo gli end.
 
@@ -116,11 +121,14 @@ int main(int argc, char* argv[]) {
         kdpoints.push_back(kd); //vettore kdpoints per costruzione albero
         
     }
+
+    #ifndef NBEDUG
     cout << "KDPoints (x_end, y_end) prima del buildTree:\n";
     for (int i = 0; i < kdpoints.size(); i++) {
-        cout << i << " -> (" << kdpoints[i]->getX() 
+        cout << "id kdpoint :" << kdpoints[i]->getId() << " -> (" << kdpoints[i]->getX() 
          << "," << kdpoints[i]->getY() << ")\n";
-}
+    }
+    #endif
 
     ///costruisco kdtree
 
@@ -165,6 +173,14 @@ int main(int argc, char* argv[]) {
         // false (end) prima di true (begin)
     });
 
+    #ifndef NDEBUG
+    for (int i = 0; i < pti.size(); i++) {
+        cout << i << ": (" << pti[i].x << "," << pti[i].y << ") " 
+             << (pti[i].isBegin ? "BEGIN" : "END") 
+             << ", id: " << pti[i].id << "\n";
+    }
+    #endif
+
     //sweep line
     int n_pti=pti.size();
     
@@ -174,17 +190,16 @@ int main(int argc, char* argv[]) {
 
         if(pti.at(i).isBegin){
             
-
             KDpoint* p = tree.rmq(pti.at(i).x,pti.at(i).y);
-            cout << "punto analizzato :" << pti.at(i).x << "," << pti.at(i).y << "\n";
-            cout << "punto rmq: " << p->getX() << "," << p->getY() << "\n";
+
 
             if(p != nullptr && p->getId() != idcurr) {
                 int idPrec = p->getId();
-                cout << " id prec :  " << idPrec << "\n";
                 Anchor &prev = anchors[idPrec];
-                anchors[idcurr].setPrec(idPrec);            //gapcost
-                anchors[idcurr].setScore(prev.getScore()-((anchors[idcurr].getXbegin()-anchors[idPrec].getXend())+(anchors[idcurr].getYbegin()-anchors[idPrec].getYend())));
+                anchors[idcurr].setPrec(idPrec);
+                //gapcost
+                int gap = ((anchors[idcurr].getXbegin()-anchors[idPrec].getXend())+(anchors[idcurr].getYbegin()-anchors[idPrec].getYend()));
+                anchors[idcurr].setScore(prev.getScore()-gap);
             }
             else {
                 anchors[idcurr].setPrec(-1);
@@ -193,17 +208,17 @@ int main(int argc, char* argv[]) {
             
         }
         else if(!pti.at(i).isBegin){
-
-            KDpoint * kd= kdpoints[idcurr];
-            kd->setGc(pti[n_pti-1].x, pti[n_pti-1].y);
-            kd->setPriority(anchors[idcurr].getScore());
-            tree.activatePoint(kd);  
+    
+            kdpoints[idcurr]->setGc(pti[n_pti-1].x, pti[n_pti-1].y);
+            kdpoints[idcurr]->setPriority(anchors[idcurr].getScore());
+            tree.activatePoint(kdpoints[idcurr]);  
             
         }
 
 
     }
     
+
     cout << "valori precedent:\n";
     for (int i = 0; i < anchors.size(); i++) {
         cout << i << " -> " << anchors[i].getPrec() << endl;

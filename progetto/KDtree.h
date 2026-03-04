@@ -15,7 +15,7 @@ class KDtree {
     void printGraph(KDnode* node, int depth);
 
     public :
-    KDtree(std::vector<KDpoint*>& points);
+    KDtree(std::vector<KDpoint*> points);
     KDpoint* rmq(int xmax, int ymax);
     void activatePoint(KDpoint* p);
     void printAlbero();
