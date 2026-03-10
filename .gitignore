@@ -1,0 +1,14 @@
+
+build/
+dist/
+out/
+
+*.tmp
+*.log
+
+*.o
+*.exe
+
+.vscode/
+.idea/
+*.swp
