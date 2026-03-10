@@ -1,11 +1,12 @@
 #include "KDtree.h"
 #include "KDnode.h"
 #include "KDpoint.h"
-#include "Range.h"
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
 #include <iostream>
+
+
 
 KDnode * KDtree::buildTree(std::vector<KDnode*>& p, int depth) {
 
@@ -86,9 +87,21 @@ void KDtree::printGraph(KDnode* node, int depth) {
     printGraph(node->getLeft(), depth + 1);
 }
 
+void KDtree::destroy(KDnode* node) {
+    if (!node)
+        return;
+    destroy(node->getLeft());
+    destroy(node->getRight());
+    delete node;
+}
+
 ///////////public
 KDtree::KDtree(std::vector<KDnode*> points) {
     root = buildTree(points, 0);
+}
+
+KDtree::~KDtree() {
+    destroy(root);
 }
 KDpoint * KDtree::rmq(int xmax, int ymax) {
 

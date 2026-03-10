@@ -1,4 +1,4 @@
-#ifndef KDNODE_H
+#pragma once
 #define KDNODE_H
 #include "KDpoint.h"
 
@@ -15,7 +15,7 @@ class KDnode{
     public : 
 
         KDnode(KDpoint* p);
-        ~KDnode();
+       // ~KDnode();
 
         bool isActive() const;
         int getAsse() const;
@@ -31,4 +31,3 @@ class KDnode{
         void activate();
 
 };
-#endif

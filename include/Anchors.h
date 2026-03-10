@@ -1,4 +1,4 @@
-#ifndef ANCHORS_H
+#pragma once
 #define ANCHORS_H
 
 class Anchor{
@@ -13,6 +13,7 @@ class Anchor{
     public : 
 
         Anchor ();
+        
         Anchor(int xb, int yb, int xe, int ye, int w);
 
         int getXbegin() const;
@@ -27,4 +28,3 @@ class Anchor{
 
 };
 
-#endif

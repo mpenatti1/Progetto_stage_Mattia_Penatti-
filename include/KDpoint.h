@@ -1,4 +1,4 @@
-#ifndef KDPOINT_H
+#pragma once
 #define KDPOINT_H
 class KDpoint{
 
@@ -25,4 +25,3 @@ class KDpoint{
         
 
 }; 
-#endif

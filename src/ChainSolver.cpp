@@ -83,6 +83,8 @@ void ChainSolver::printChainRec(Anchor & a, std::vector<Anchor> & anchors) {
     cout << a.getPrec() << " ";
 }
 
+
+
 void ChainSolver::solve(std::vector<Anchor>& anchors){
     
     std::vector<KDpoint*> kdpoints = buildkdPoints(anchors);
@@ -100,30 +102,47 @@ void ChainSolver::solve(std::vector<Anchor>& anchors){
 
         int idcurr = pti[i].id;
 
-        if(pti.at(i).isBegin){
+        if(pti[i].isBegin){
             
-            KDpoint* p = tree.rmq(pti.at(i).x,pti.at(i).y);
+            KDpoint* p = tree.rmq(pti[i].x,pti[i].y);
 
 
             if(p != nullptr && p->getId() != idcurr) {
                 int idPrec = p->getId();
+
+                if (idPrec <0 || idPrec >= anchors.size() || idcurr < 0 || idcurr >= anchors.size()) {
+                    cerr << "Error: idPrec or idcurr out of bounds. idPrec: " << idPrec << ", idcurr: " << idcurr << endl;
+                    continue; // Skip this iteration to avoid out-of-bounds access
+                }
+
                 Anchor &prev = anchors[idPrec];
                 anchors[idcurr].setPrec(idPrec);
+                
                 //gapcost
                 int gap = ((anchors[idcurr].getXbegin()-anchors[idPrec].getXend())+(anchors[idcurr].getYbegin()-anchors[idPrec].getYend()));
                 anchors[idcurr].setScore(prev.getScore()-gap);
             }
             else {
+
                 anchors[idcurr].setPrec(-1);
                 anchors[idcurr].setScore(0);
             }
             
         }
-        else if(!pti.at(i).isBegin){
+        else if(!pti[i].isBegin){
     
-            kdpoints[idcurr]->setGc(pti[n_pti-1].x, pti[n_pti-1].y);
-            kdpoints[idcurr]->setPriority(anchors[idcurr].getScore());
-            kdnodes[idcurr]->activate();  
+            if (idcurr < 0 || idcurr >= anchors.size()) {
+                cerr << "Error: idcurr out of bounds. idcurr: " << idcurr << endl;
+                continue; // Skip this iteration to avoid out-of-bounds access
+            }
+            if(kdpoints[idcurr] && kdnodes[idcurr]) {
+                kdpoints[idcurr]->setGc(pti[n_pti-1].x, pti[n_pti-1].y);
+                kdpoints[idcurr]->setPriority(anchors[idcurr].getScore());
+                kdnodes[idcurr]->activate();
+            }
+            else {
+                cerr << "errore: non esistono kdpoint o kdnodes per l'indice " << idcurr << endl;
+            }
             
         }
 
@@ -139,5 +158,9 @@ void ChainSolver::solve(std::vector<Anchor>& anchors){
     printChainRec(anchors.back(), anchors);
     cout << "score : ";
     printf("%d\n",anchors.back().getScore());
+
+    //distruggo kdpoints
+    for (auto p : kdpoints)
+    delete p;
 
 }

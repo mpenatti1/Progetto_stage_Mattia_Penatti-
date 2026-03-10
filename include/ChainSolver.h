@@ -18,7 +18,7 @@ class ChainSolver{
     public :
     
         void solve(std::vector<Anchor>& anchors);
-
+        
     private : 
         std::vector<KDpoint*> buildkdPoints(const std::vector<Anchor>& anchors);
         std::vector<KDnode*> buildkdNodes(const std::vector<KDpoint*>& kdpoints);
