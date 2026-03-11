@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 
 
 
@@ -48,7 +49,7 @@ void KDtree::rmqRec(KDnode* node,  Range& R, KDpoint*& best) {
 
     if (node->isActive() && R.contains(p)) {
         
-        if (!best || p->getPriority() > best->getPriority()) {
+        if (!best || p->getPriority() >= best->getPriority()) {
             best = p;
             
         }
@@ -69,6 +70,7 @@ void KDtree::rmqRec(KDnode* node,  Range& R, KDpoint*& best) {
     }
 }
 
+
 void KDtree::printGraph(KDnode* node, int depth) {
 
     if (!node)
@@ -77,11 +79,11 @@ void KDtree::printGraph(KDnode* node, int depth) {
     printGraph(node->getRight(), depth + 1);
 
     for (int i = 0; i < depth; i++)
-        std::cout << "    ";
+        std::cerr << "    ";
 
     KDpoint* p = node->getPoint();
-    std::cout << p->getX() << " , " << p->getY();
-    std::cout << ((node->getAsse() == 0) ? " (X)" : " (Y)") << "\n";
+    std::cerr << p->getX() << " , " << p->getY();
+    std::cerr << ((node->getAsse() == 0) ? " (X)" : " (Y)") << "\n";
 
     printGraph(node->getLeft(), depth + 1);
 }

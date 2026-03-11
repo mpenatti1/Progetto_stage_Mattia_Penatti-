@@ -9,6 +9,10 @@ TARGET = maximalColinearChaining
 
 all: $(TARGET)
 
+release: CXXFLAGS = -g -O0 -DNDEBUG -Iinclude
+release : $(TARGET)
+
+
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 

@@ -3,13 +3,7 @@
 
 KDnode::KDnode(KDpoint* p)
     : point(p), axis(-1), left(nullptr), right(nullptr), active(false){}
-    
-/*KDnode::~KDnode() {
-    delete point;
-    delete left;
-    delete right;
-}
-*/
+
 KDpoint* KDnode::getPoint() const { return point; }
 KDnode* KDnode::getLeft() const { return left; }
 KDnode* KDnode::getRight() const { return right; }

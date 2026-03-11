@@ -65,7 +65,8 @@ vector <PointLineSweep> buildPti(const vector<Anchor>& anchors){
             i
         });
     }
-    sort(pti.begin(), pti.end(),
+
+    sort(pti.begin()+1, pti.end()-1,
     [](const PointLineSweep& a, const PointLineSweep& b){
         if (a.x != b.x) return a.x < b.x;
         return a.isBegin < b.isBegin; 
@@ -75,19 +76,21 @@ vector <PointLineSweep> buildPti(const vector<Anchor>& anchors){
     return pti;
 }
 
-void printChainRec(Anchor & a, std::vector<Anchor> & anchors, ofstream & out) {
+void printChainRec(Anchor & a, std::vector<Anchor> & anchors) {
     if(a.getPrec() == -1){
-        out << a.getXbegin() << " " << a.getYbegin() << " " << a.getXend() << " " << a.getYend() << " " << a.getId() << endl;  // o niente se vuoi ignorare -1
+        cout << a.getXbegin() << " " << a.getYbegin() << " " << a.getXend() << " " << a.getYend() << " " << a.getId() << endl;  // o niente se vuoi ignorare -1
         return;
     }
-    printChainRec(anchors.at(a.getPrec()),anchors, out); // vai al precedente
-    out << a.getXbegin() << " " << a.getYbegin() << " " << a.getXend() << " " << a.getYend() << " " << a.getId() << endl;
+    printChainRec(anchors.at(a.getPrec()),anchors); // vai al precedente
+    cout << a.getXbegin() << " " << a.getYbegin() << " " << a.getXend() << " " << a.getYend() << " " << a.getId() << endl;
 }
 
 
 
 void solve(std::vector<Anchor>& anchors){
     
+    
+
     std::vector<KDpoint*> kdpoints = buildkdPoints(anchors);
 
     std::vector<KDnode*> kdnodes  = buildkdNodes(kdpoints);
@@ -105,11 +108,14 @@ void solve(std::vector<Anchor>& anchors){
 
         if(pti[i].isBegin){
             
-            KDpoint* p = tree.rmq(pti[i].x,pti[i].y);
+            KDpoint* p = tree.rmq(pti[i].x ,pti[i].y );
 
+            
 
             if(p != nullptr && p->getId() != idcurr) {
                 int idPrec = p->getId();
+
+                
 
                 if (idPrec <0 || idPrec >= anchors.size() || idcurr < 0 || idcurr >= anchors.size()) {
                     cerr << "Error: idPrec or idcurr out of bounds. idPrec: " << idPrec << ", idcurr: " << idcurr << endl;
@@ -122,6 +128,14 @@ void solve(std::vector<Anchor>& anchors){
                 //gapcost
                 int gap = ((anchors[idcurr].getXbegin()-anchors[idPrec].getXend())+(anchors[idcurr].getYbegin()-anchors[idPrec].getYend()));
                 anchors[idcurr].setScore(prev.getScore()-gap);
+
+                #ifndef NDEBUG
+                cerr << "\nBEGIN"<< endl;
+                cerr << "Processing point: (" << pti[i].x << ", " << pti[i].y << ") - id: " << idcurr << endl;
+                cerr << "Best point found: (" << p->getX() << ", " << p->getY() << ") - id: " << idPrec << endl;
+                cerr << "Updated anchor score: " << anchors[idcurr].getScore() << endl;
+                #endif
+                
             }
             else {
 
@@ -131,7 +145,7 @@ void solve(std::vector<Anchor>& anchors){
             
         }
         else if(!pti[i].isBegin){
-    
+
             if (idcurr < 0 || idcurr >= anchors.size()) {
                 cerr << "Error: idcurr out of bounds. idcurr: " << idcurr << endl;
                 continue; // Skip this iteration to avoid out-of-bounds access
@@ -144,27 +158,29 @@ void solve(std::vector<Anchor>& anchors){
             else {
                 cerr << "errore: non esistono kdpoint o kdnodes per l'indice " << idcurr << endl;
             }
+            //////////
+            #ifndef NDEBUG
+            cerr << "\nEND"<< endl;
+            cerr << "Processing point: (" << pti[i].x << ", " << pti[i].y << ") - id: " << idcurr << endl;
+            cerr << "priority : " << kdpoints[idcurr]->getPriority() << endl;
+            #endif
             
         }
 
 
     }
 
-    cout << "valori precedent:\n";
+    #ifndef NDEBUG
+    tree.printAlbero();
+    cerr << "valori precedent:\n";
     for (int i = 0; i < anchors.size(); i++) {
-        cout << i << " -> " << anchors[i].getPrec() << endl;
+        cerr << i << " -> " << anchors[i].getPrec() << endl;
     }
+    #endif
     
-    
-
-    ofstream out("longest_chain.txt");
-
-    out << "x_begin y_begin x_end y_end id\n";
-    printChainRec(anchors.back(), anchors, out);
-
-    out << "Score totale: " << anchors.back().getScore() << endl;
-
-    out.close();
+    cout << "x_begin y_begin x_end y_end id\n";
+    printChainRec(anchors.back(), anchors);
+    cout << "Score totale: " << anchors.back().getScore() << endl;
 
     //distruggo kdpoints
     for (auto p : kdpoints)
