@@ -1,6 +1,6 @@
 #include "ReadAnchors.h"
 #include <vector>
-#include "Anchors.h"
+#include "Anchor.h"
 #include <string>
 #include <fstream>
 #include <iostream>

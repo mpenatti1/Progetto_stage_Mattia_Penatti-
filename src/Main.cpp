@@ -1,4 +1,4 @@
-#include "Anchors.h"
+#include "Anchor.h"
 #include "ChainSolver.h"
 #include <vector>
 #include "ReadAnchors.h"
@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
     } 
     #endif
     */
-   
+
     ChainSolver solver;
     solver.solve(anchors);
     

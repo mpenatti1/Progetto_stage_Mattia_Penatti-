@@ -1,5 +1,5 @@
 #pragma once
-#define ANCHORS_H
+#define ANCHOR_H
 
 class Anchor{
 
