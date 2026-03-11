@@ -7,6 +7,7 @@ class Anchor{
         int x_begin,y_begin;
         int x_end,y_end;
         int weight;
+        int id;
         int score;
         int prec;
 
@@ -14,12 +15,13 @@ class Anchor{
 
         Anchor ();
         
-        Anchor(int xb, int yb, int xe, int ye, int w);
+        Anchor(int xb, int yb, int xe, int ye, int w, int i);
 
         int getXbegin() const;
         int getYbegin() const;
         int getXend() const;
         int getYend() const;
+        int getId() const;
         int getWeight() const;
         int getScore()const;
         int getPrec()const;

@@ -20,16 +20,18 @@ vector <Anchor> readAnchors(){
     int max_y=0;
 
     int xb,yb,xe,ye,w;
+    int i=1;
 
     //ancora begin
       
-    anchors.insert(anchors.begin(), Anchor(0,0,0,0,0));
+    anchors.insert(anchors.begin(), Anchor(0,0,0,0,0,0));
 
     while(fin >> xb >> yb >> xe >> ye >> w){
 
-        anchors.emplace_back(xb,yb,xe,ye,w);
+        anchors.emplace_back(xb,yb,xe,ye,w,i++);
         if (xe > max_x) max_x = xe;
         if (ye > max_y) max_y = ye;
+        
     }
     
 
@@ -37,7 +39,7 @@ vector <Anchor> readAnchors(){
         
     anchors.insert(anchors.end(),Anchor(max_x+ 1, max_y + 1,
                             max_x + 1, max_y + 1,
-                            0) );
+                            0, anchors.size()) );
     
     //fin.close();
 

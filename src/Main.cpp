@@ -29,7 +29,6 @@ int main(int argc, char* argv[]) {
     #endif
     */
 
-    ChainSolver solver;
-    solver.solve(anchors);
+    solve(anchors);
     
 }

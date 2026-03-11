@@ -9,6 +9,7 @@ maximalColinearChaining
 
 *.o
 *.exe
+*.txt
 
 .vscode/
 .idea/

@@ -6,9 +6,10 @@
 using namespace std;
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 
 
-vector<KDpoint*> ChainSolver::buildkdPoints(const vector<Anchor>& anchors){
+vector<KDpoint*> buildkdPoints(const vector<Anchor>& anchors){
 
     vector<KDpoint*> kdpoints;
     
@@ -28,7 +29,7 @@ vector<KDpoint*> ChainSolver::buildkdPoints(const vector<Anchor>& anchors){
     return kdpoints;
 }
 
-vector <KDnode*> ChainSolver::buildkdNodes(const vector<KDpoint*>& kdpoints){
+vector <KDnode*> buildkdNodes(const vector<KDpoint*>& kdpoints){
     
     vector<KDnode*> kdnodes;
 
@@ -41,7 +42,7 @@ vector <KDnode*> ChainSolver::buildkdNodes(const vector<KDpoint*>& kdpoints){
     return kdnodes;
 } 
 
-vector <PointLineSweep> ChainSolver::buildPti(const vector<Anchor>& anchors){
+vector <PointLineSweep> buildPti(const vector<Anchor>& anchors){
 
     vector<PointLineSweep> pti;
 
@@ -74,18 +75,18 @@ vector <PointLineSweep> ChainSolver::buildPti(const vector<Anchor>& anchors){
     return pti;
 }
 
-void ChainSolver::printChainRec(Anchor & a, std::vector<Anchor> & anchors) {
+void printChainRec(Anchor & a, std::vector<Anchor> & anchors, ofstream & out) {
     if(a.getPrec() == -1){
-        cout << a.getPrec() << " ";  // o niente se vuoi ignorare -1
+        out << a.getXbegin() << " " << a.getYbegin() << " " << a.getXend() << " " << a.getYend() << " " << a.getId() << endl;  // o niente se vuoi ignorare -1
         return;
     }
-    printChainRec(anchors.at(a.getPrec()),anchors); // vai al precedente
-    cout << a.getPrec() << " ";
+    printChainRec(anchors.at(a.getPrec()),anchors, out); // vai al precedente
+    out << a.getXbegin() << " " << a.getYbegin() << " " << a.getXend() << " " << a.getYend() << " " << a.getId() << endl;
 }
 
 
 
-void ChainSolver::solve(std::vector<Anchor>& anchors){
+void solve(std::vector<Anchor>& anchors){
     
     std::vector<KDpoint*> kdpoints = buildkdPoints(anchors);
 
@@ -154,10 +155,16 @@ void ChainSolver::solve(std::vector<Anchor>& anchors){
         cout << i << " -> " << anchors[i].getPrec() << endl;
     }
     
-    cout << "catena più lunga :\n ";
-    printChainRec(anchors.back(), anchors);
-    cout << "score : ";
-    printf("%d\n",anchors.back().getScore());
+    
+
+    ofstream out("longest_chain.txt");
+
+    out << "x_begin y_begin x_end y_end id\n";
+    printChainRec(anchors.back(), anchors, out);
+
+    out << "Score totale: " << anchors.back().getScore() << endl;
+
+    out.close();
 
     //distruggo kdpoints
     for (auto p : kdpoints)
