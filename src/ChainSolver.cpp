@@ -108,15 +108,17 @@ void solve(std::vector<Anchor>& anchors){
 
         if(pti[i].isBegin){
             
-            KDpoint* p = tree.rmq(pti[i].x ,pti[i].y );
+            #ifndef NDEBUG
+            cerr << "\nBEGIN"<< endl;
+            cerr << "Processing point: (" << pti[i].x << ", " << pti[i].y << ") - id: " << idcurr << endl;
+            #endif
 
-            
+            KDpoint* p = tree.rmq(pti[i].y ); 
 
-            if(p != nullptr && p->getId() != idcurr) {
+            if(p != nullptr) {
+
                 int idPrec = p->getId();
-
-                
-
+            
                 if (idPrec <0 || idPrec >= anchors.size() || idcurr < 0 || idcurr >= anchors.size()) {
                     cerr << "Error: idPrec or idcurr out of bounds. idPrec: " << idPrec << ", idcurr: " << idcurr << endl;
                     continue; // Skip this iteration to avoid out-of-bounds access
@@ -127,18 +129,25 @@ void solve(std::vector<Anchor>& anchors){
                 
                 //gapcost
                 int gap = ((anchors[idcurr].getXbegin()-anchors[idPrec].getXend())+(anchors[idcurr].getYbegin()-anchors[idPrec].getYend()));
+                
+                #ifndef NDEBUG
+                cerr << "Best point found: (" << p->getX() << ", " << p->getY() << ") - id: " << idPrec << endl;
+                cerr << "peso di "<< anchors[idcurr].getId() << " : " << anchors[idcurr].getWeight() << endl;
+                cerr << "score predecessore : " << prev.getScore() << endl;
+                cerr << "gap cost : " << gap << endl;
+                #endif
+
                 anchors[idcurr].setScore(prev.getScore()-gap);
 
                 #ifndef NDEBUG
-                cerr << "\nBEGIN"<< endl;
-                cerr << "Processing point: (" << pti[i].x << ", " << pti[i].y << ") - id: " << idcurr << endl;
-                cerr << "Best point found: (" << p->getX() << ", " << p->getY() << ") - id: " << idPrec << endl;
                 cerr << "Updated anchor score: " << anchors[idcurr].getScore() << endl;
                 #endif
-                
             }
             else {
-
+                #ifndef NDEBUG  
+                
+                cerr << "No valid predecessor found for anchor id: " << idcurr << ". Setting prec to -1 and score to 0." << endl;
+                #endif
                 anchors[idcurr].setPrec(-1);
                 anchors[idcurr].setScore(0);
             }

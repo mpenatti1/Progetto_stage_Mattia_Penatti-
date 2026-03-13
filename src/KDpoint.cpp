@@ -6,8 +6,9 @@
 
     int KDpoint::getX() const { return x; }
     int KDpoint::getY() const { return y; }
-    int KDpoint::getPriority() const { return priority; }
     int KDpoint::getId() const { return id; }
+    int KDpoint::getGc() const { return gc; }
+    int KDpoint::getPriority() const { return priority; }
 
     void KDpoint::setGc(int xb, int yb) {
         gc = (xb - x) + (yb - y);

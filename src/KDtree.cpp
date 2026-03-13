@@ -47,6 +47,10 @@ void KDtree::rmqRec(KDnode* node,  Range& R, KDpoint*& best) {
 
     KDpoint* p = node->getPoint();
 
+    #ifndef NDEBUG
+    std::cerr << "nodo visitato --> id : "<< p->getId() << ", attivo ? : " << node->isActive() << ", contiene ? " << R.contains(p) << ", priority : "<< p->getPriority() << std::endl;
+    #endif
+
     if (node->isActive() && R.contains(p)) {
         
         if (!best || p->getPriority() >= best->getPriority()) {
@@ -58,17 +62,16 @@ void KDtree::rmqRec(KDnode* node,  Range& R, KDpoint*& best) {
     int axis = node->getAsse();
 
     if (axis == 0) { // split su X
-        if (R.xmin <= p->getX())
             rmqRec(node->getLeft(), R, best);
-        if (R.xmax >= p->getX())
             rmqRec(node->getRight(), R, best);
     } else { // split su Y
-        if (R.ymin <= p->getY())
+        if (0 <= p->getY())
             rmqRec(node->getLeft(), R, best);
-        if (R.ymax >= p->getY())
+        if (R.y >= p->getY())
             rmqRec(node->getRight(), R, best);
     }
 }
+
 
 
 void KDtree::printGraph(KDnode* node, int depth) {
@@ -104,9 +107,10 @@ KDtree::KDtree(std::vector<KDnode*> points) {
 KDtree::~KDtree() {
     destroy(root);
 }
-KDpoint * KDtree::rmq(int xmax, int ymax) {
 
-    Range R{0, xmax, 0, ymax};
+KDpoint * KDtree::rmq(int ymax) {
+
+    Range R{ymax};
 
     KDpoint* best = nullptr;
 

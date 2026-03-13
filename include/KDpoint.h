@@ -17,7 +17,7 @@ class KDpoint{
         int getY() const;
         int getPriority() const;
         int getId() const;
-        int getGc() const { return gc; }
+        int getGc() const;
 
 
         void setGc(int xb, int yb);
