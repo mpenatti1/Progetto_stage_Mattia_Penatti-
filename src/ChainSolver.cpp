@@ -77,12 +77,13 @@ vector <PointLineSweep> buildPti(const vector<Anchor>& anchors){
 }
 
 void printChainRec(Anchor & a, std::vector<Anchor> & anchors) {
-    if(a.getPrec() == -1){
+    if(a.getPrec() == -1) {
         cout << a.getXbegin() << " " << a.getYbegin() << " " << a.getXend() << " " << a.getYend() << " " << a.getId() << endl;  // o niente se vuoi ignorare -1
         return;
     }
     printChainRec(anchors.at(a.getPrec()),anchors); // vai al precedente
     cout << a.getXbegin() << " " << a.getYbegin() << " " << a.getXend() << " " << a.getYend() << " " << a.getId() << endl;
+    
 }
 
 
@@ -184,6 +185,10 @@ void solve(std::vector<Anchor>& anchors){
     cerr << "valori precedent:\n";
     for (int i = 0; i < anchors.size(); i++) {
         cerr << i << " -> " << anchors[i].getPrec() << endl;
+    }
+
+    for (int i=0;i < anchors.size();i++){
+        cerr << kdpoints[i]->getId() << " -> priority : " << kdpoints[i]->getPriority() << endl;
     }
     #endif
     
