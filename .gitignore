@@ -5,7 +5,7 @@ out/
 
 maximalColinearChaining
 debug.txt
-longestChain.txt
+longest_chain.txt
 *.tmp
 *.log
 
