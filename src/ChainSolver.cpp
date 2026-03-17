@@ -78,11 +78,11 @@ vector <PointLineSweep> buildPti(const vector<Anchor>& anchors){
 
 void printChainRec(Anchor & a, std::vector<Anchor> & anchors) {
     if(a.getPrec() == -1) {
-        cout << a.getXbegin() << " " << a.getYbegin() << " " << a.getXend() << " " << a.getYend() << " " << a.getId() << endl;  // o niente se vuoi ignorare -1
+        cout << a.getXbegin() << " " << a.getYbegin() << " " << a.getXend() << " " << a.getYend() << " " << a.getWeight() << endl;  // o niente se vuoi ignorare -1
         return;
     }
     printChainRec(anchors.at(a.getPrec()),anchors); // vai al precedente
-    cout << a.getXbegin() << " " << a.getYbegin() << " " << a.getXend() << " " << a.getYend() << " " << a.getId() << endl;
+    cout << a.getXbegin() << " " << a.getYbegin() << " " << a.getXend() << " " << a.getYend() << " " << a.getWeight() << endl;
     
 }
 
@@ -114,7 +114,7 @@ void solve(std::vector<Anchor>& anchors){
             cerr << "Processing point: (" << pti[i].x << ", " << pti[i].y << ") - id: " << idcurr << endl;
             #endif
 
-            KDpoint* p = tree.rmq(pti[i].y ); 
+            KDpoint* p = tree.rmq(pti[i].x, pti[i].y ); 
 
             if(p != nullptr) {
 
@@ -192,7 +192,7 @@ void solve(std::vector<Anchor>& anchors){
     }
     #endif
     
-    cout << "x_begin y_begin x_end y_end id\n";
+    cout << "x_begin y_begin x_end y_end weight\n";
     printChainRec(anchors.back(), anchors);
     cout << "Score totale: " << anchors.back().getScore() << endl;
 

@@ -13,11 +13,15 @@ class KDtree {
     KDnode* root;
     
     struct Range {
-        int y;
+        int xmin, xmax;
+        int ymin, ymax;
 
-        Range(int ymax) : y(ymax) {}
+        Range(int x_min, int x_max, int y_min, int y_max)
+            : xmin(x_min), xmax(x_max), ymin(y_min), ymax(y_max) {}
+
         bool contains(KDpoint* p) const {
-            return p->getY() <= y;
+            return p->getX() >= xmin && p->getX() <= xmax &&
+                   p->getY() >= ymin && p->getY() <= ymax;
         }
     };
 
@@ -31,7 +35,7 @@ class KDtree {
     
     KDtree(std::vector<KDnode*> points);
     ~KDtree();
-    KDpoint* rmq( int ymax);
+    KDpoint* rmq(int xmax, int ymax);
     void printAlbero();
     KDnode* getRoot();
 
