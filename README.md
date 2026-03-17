@@ -108,6 +108,7 @@ Alla catena vengono aggiunte un' ancora di inizio (0,0,0,0,0) e una di fine (11,
 ## Referenze 
 - Dispense del corso di Genome Comparison, Freie Universität Berlin  
 https://www.mi.fu-berlin.de/wiki/pub/ABI/GenomeComparisonP4/chaining.pdf
+- KD-Tree - https://en.wikipedia.org/wiki/K-d_tree
 ## Autore
 - Mattia Penatti
 
