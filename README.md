@@ -1,15 +1,15 @@
-# MAXIMAL COLINEAR CHAINING -- FASE DI CHAINING 
+# MAXIMAL COLINEAR CHAINING 
 
 ## In generale
 
-Il Maximal Colinear Chaining è un algoritmo applicato nella bioinformatica con lo scopo di trovare, dati 2 genomi, la **sequenza di corrispondenze (ancore) con massimo score**.  
+Il Maximal Colinear Chaining è un algoritmo applicato nella bioinformatica con lo scopo di trovare, dati 2 genomi, la **sequenza di corrispondenze (ancore) con massimo score**. Esso è operato nel macroproblema di **sequence alignment** di k genomi. 
 Applicazioni comuni :
 - allineamento di sequenze genomiche
 - genome mapping
 - comparazione tra genomi
 - analisi di similarità tra stringhe  
 
-Esso è suddiviso in 3 fasi : 
+Il sequence alignment è suddiviso in 3 fasi: 
 1) Ricerca dei frammenti simili tra i genomi
 2) **Chaining**
 3) Allineamento delle regioni tra le ancore
