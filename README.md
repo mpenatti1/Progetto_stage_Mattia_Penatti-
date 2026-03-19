@@ -3,7 +3,7 @@
 ## In generale
 
 Il Maximal Colinear Chaining è un algoritmo applicato nella bioinformatica con lo scopo di trovare, dati 2 genomi, la **sequenza di corrispondenze (ancore) con massimo score**. Esso viene impiegato nel contesto del macroproblema dell’**allineamento di sequenze** (*sequence alignment*) tra k genomi.   
-Applicazioni comuni :
+Applicazioni comuni:
 - allineamento di sequenze genomiche
 - genome mapping
 - comparazione tra genomi
@@ -18,26 +18,26 @@ In questa libreria ci occupiamo del secondo punto -- la fase di Chaining delle a
 
 ## Overview
 Date in input n ancore, restituisce la catena di ancore con massimo score. 
-Devono essere rispettati 2 vincoli : 
-- colinearità --> le ancore devono essere colineari
-- non sovrapposizione --> le ancore non devono essere sovrapposte
+Devono essere rispettati **2 vincoli**: 
+- **colinearità** --> le ancore devono essere colineari
+- **non sovrapposizione** --> le ancore non devono essere sovrapposte
 
 Ogni ancora/frammento è una corrispondenza tra i 2 genomi. Essa è caratterizzata da un punto di inizio, un punto di fine, e un peso.  
-Il formato di ogni ancora è quindi del tipo : ( x_begin, y_begin, x_end, y_end, weight )  
+Il formato di ogni ancora è quindi del tipo: ( x_begin, y_begin, x_end, y_end, weight )  
 Dati 2 frammenti f e f', per rispettare i 2 vincoli durante la concatenazione, viene verificato :  
 `f.x_end < f'.x_begin && f.y_end < f'.y_begin con f << f' `   
 Durante l' esecuzione a ogni ancora viene associato uno score. Tramite una funzione di ricerca dedita a  trovare il miglio predecessore, la RMQ (Range Maximum Query), ad ogni frammento f' viene concatenato la catena di frammenti che presenta il massimo score.   
-Lo score quindi è definito come : *f'.score = f.score + f'.weight*  
+Lo score quindi è definito come: *f'.score = f.score + f'.weight*  
 Nel chaining problem teniamo in considerazione anche la distanza tra i frammenti, i gap cost, i quali rappresentano una penalità : maggiore è la distanza tra le ancore, maggiore è il costo sottratto allo score.
-Dati 2 frammenti f e f', definiamo il gap cost come : 
+Dati 2 frammenti f e f', definiamo il gap cost come: 
 - **gc(f',f) = d( beg(f') , end(f) )**  **∀ f << f'**
 ##### (d = distanza tra i 2 punti)    
 
-Riscriviamo lo score di ogni frammento come :
+Riscriviamo lo score di ogni frammento come:
 - **f'.score = f'.weight + f.score - gc(f',f)**  
 
 Associamo ad ogni ancora una nuova variabile, la **priority**, essa indica lo score corretto che tiene conto anche del costo geometrico verso il nodo terminale.
-Definita come :    
+Definita come:    
 - **f'.priority= f'.score - gc(f', t)**  
 
 Dove t rappresenta un' ancora fittizia posta alla fine della catena.  
@@ -50,17 +50,21 @@ Date queste definizioni procediamo all' utilizzo effettivo del programma.
 ## Utilizzo
 
 ### Main
-Nel Main devono essere incluse :   
-` #include "Anchor.h"`   
-` #include "ChainSolver.h"`   
-` #include <vector> `  
-` #include "ReadAnchors.h"`      
+Nel Main devono essere incluse:   
+```cpp
+ #include "Anchor.h"   
+ #include "ChainSolver.h" 
+ #include <vector>   
+ #include "ReadAnchors.h"
+ ```      
 
 È consigliabile inserire il file main.cpp nella cartella src insieme agli altri sorgenti. In questo modo, i percorsi degli #include rimangono coerenti e non è necessario specificare cammini relativi complessi per raggiungere gli header della libreria.  
 
-Per l' esecuzione è necessario inserire nel codice :   
-` vector <Anchor> anchors = readAnchors();`   
-` solve(anchors);`
+Per l' esecuzione è necessario inserire nel codice:   
+```cpp
+vector <Anchor> anchors = readAnchors();  
+solve(anchors);
+```
 
 
 ### Makefile 
@@ -73,7 +77,7 @@ Per l' esecuzione : **./maximalColinearChaining < input.txt > output.txt 2> debu
 ### Formato Input
 
 Lista di ancore ( x_begin, y_begin, x_end, y_end, weight)  
-Esempio :  
+Esempio:  
 
 1 1 3 5 6  
 2 4 4 6 4  
@@ -83,7 +87,7 @@ Esempio :
 ### Formato Output
 
 La catena colineare non sovrapposta di ancore.  
-Esempio :  
+Esempio:  
 
 x_begin y_begin x_end y_end weight  
 0 0 0 0 0  
@@ -102,8 +106,8 @@ Alla catena vengono aggiunte un' ancora di inizio (0,0,0,0,0) e una di fine (11,
 
 ## Complessità
 
-- Time complexity : O(n log(n) ) 
-- Space complexity : O(n)
+- Time complexity: O(n log(n) ) 
+- Space complexity: O(n)
 
 ## Referenze 
 - Dispense del corso di Genome Comparison, Freie Universität Berlin  
