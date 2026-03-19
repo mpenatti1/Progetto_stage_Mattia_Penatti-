@@ -2,7 +2,7 @@
 
 ## In generale
 
-Il Maximal Colinear Chaining è un algoritmo applicato nella bioinformatica con lo scopo di trovare, dati 2 genomi, la **sequenza di corrispondenze (ancore) con massimo score**. Esso è operato nel macroproblema di **sequence alignment** di k genomi. 
+Il Maximal Colinear Chaining è un algoritmo applicato nella bioinformatica con lo scopo di trovare, dati 2 genomi, la **sequenza di corrispondenze (ancore) con massimo score**. Esso viene impiegato nel contesto del macroproblema dell’**allineamento di sequenze** (*sequence alignment*) tra k genomi.. 
 Applicazioni comuni :
 - allineamento di sequenze genomiche
 - genome mapping
