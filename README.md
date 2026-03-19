@@ -97,7 +97,8 @@ x_begin y_begin x_end y_end weight
 11 12 11 12 0  
 Score totale: 15    
 
-Alla catena vengono aggiunte un' ancora di inizio (0,0,0,0,0) e una di fine (11,12,11,12,0), necessarie per l' algoritmo.
+Alla catena vengono aggiunte un' ancora di inizio (0,0,0,0,0) e una di fine (11,12,11,12,0), necessarie per l' algoritmo.  
+<u>L' ancora (fittizzia) di fine ha come coordinate il punto di end dell' ultma ancora **reale** incrementato di 1.</u> 
 
 ## Note
 - Le ancore sono assunte già calcolate nella fase di seeding.
