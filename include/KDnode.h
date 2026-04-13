@@ -14,8 +14,10 @@ class KDnode{
 
     public : 
 
+
         KDnode(KDpoint* p);
        // ~KDnode();
+
 
         bool isActive() const;
         int getAsse() const;
