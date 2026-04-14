@@ -6,9 +6,7 @@
 #include <iostream>
 #include <fstream>
 
-// ------------------------------------------------------------
-// Funzioni utili per bounding boxes
-// ------------------------------------------------------------
+
 bool fullyInside(const Box& a, const Range& R) {
     return a.ymin >= R.ymin && a.ymax <= R.ymax;
 }
@@ -17,9 +15,7 @@ bool intersects(const Box& a, const Range& R) {
     return !(a.ymax < R.ymin || a.ymin > R.ymax);
 }
 
-// ------------------------------------------------------------
-// Costruzione KD-tree con calcolo automatico bounding boxes
-// ------------------------------------------------------------
+
 KDnode* KDtree::buildTree(std::vector<KDnode*>& p, int depth) {
 
     if (p.empty()) return nullptr;
@@ -32,7 +28,7 @@ KDnode* KDtree::buildTree(std::vector<KDnode*>& p, int depth) {
     b.xmin = b.xmax = pt->getX();
     b.ymin = b.ymax = pt->getY();
 
-    node->setRegion(b);   // 🔥 FONDAMENTALE
+    node->setRegion(b); 
 
     return node;
 }
@@ -72,9 +68,7 @@ else {
     node->setLeft(L);
     node->setRight(R);
 
-    // --------------------------------------------------------
-    // COSTRUZIONE BOUNDING BOX
-    // --------------------------------------------------------
+    //buonding box
     Box b;
     KDpoint* pt = node->getPoint();
 
