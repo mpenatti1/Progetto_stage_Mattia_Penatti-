@@ -114,7 +114,7 @@ void solve(std::vector<Anchor>& anchors){
             cerr << "Processing point: (" << pti[i].x << ", " << pti[i].y << ") - id: " << idcurr << endl;
             #endif
 
-            KDpoint* p = tree.rmq(pti[i].x, pti[i].y ); 
+            KDpoint* p = tree.rmq(pti[i].y ); 
 
             if(p != nullptr) {
 
@@ -199,5 +199,7 @@ void solve(std::vector<Anchor>& anchors){
     //distruggo kdpoints
     for (auto p : kdpoints)
     delete p;
+
+    
 
 }

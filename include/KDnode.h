@@ -2,34 +2,37 @@
 #define KDNODE_H
 #include "KDpoint.h"
 
-class KDnode{
+struct Box {
+    int xmin, xmax, ymin, ymax;
+};
 
-    private:
+class KDnode {
+
+private:
     KDpoint* point;
     KDnode* left;
     KDnode* right;
     int axis;
     bool active;
+    Box region;        
+public:
 
+    KDnode(KDpoint* p);
 
-    public : 
+    bool isActive() const;
+    int getAsse() const;
 
+    KDpoint* getPoint() const;
+    KDnode* getLeft() const;
+    KDnode* getRight() const;
 
-        KDnode(KDpoint* p);
-       // ~KDnode();
+    void setAsse(int a);
+    void setLeft(KDnode* l);
+    void setRight(KDnode* r);
+    void activate();
 
-
-        bool isActive() const;
-        int getAsse() const;
-
-
-        KDpoint* getPoint() const;
-        KDnode* getLeft() const;
-        KDnode* getRight() const;
-
-        void setAsse(int a);
-        void setLeft(KDnode* l);
-        void setRight(KDnode* r);
-        void activate();
-
+    void setRegion(Box b);   
+    Box getRegion() const;   
+    ~KDnode() {
+}
 };
