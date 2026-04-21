@@ -8,11 +8,16 @@
 
 
 bool fullyInside(const Box& a, const Range& R) {
-    return a.ymin >= R.ymin && a.ymax <= R.ymax;
+    return (a.ymin >= R.ymin && a.ymax <= R.ymax && a.xmin >= R.xmin && a.xmax <= R.xmax);
 }
 
 bool intersects(const Box& a, const Range& R) {
-    return !(a.ymax < R.ymin || a.ymin > R.ymax);
+    
+    bool Xsovrapposto = (a.xmax >= R.xmin && a.xmin <= R.xmax);
+    bool Ysovrapposto = (a.ymax >= R.ymin && a.ymin <= R.ymax);
+    
+
+    return Ysovrapposto && Xsovrapposto;
 }
 
 
@@ -149,9 +154,9 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
     }
 }
 
-KDpoint* KDtree::rmq(int ymax) {
+KDpoint* KDtree::rmq(int xmax,int ymax) {
 
-    Range R{0, ymax};
+    Range R{0,xmax,0, ymax};
 
     KDpoint* best = nullptr;
 

@@ -7,11 +7,14 @@
 
 
 struct Range {
-    int ymin, ymax;
+    int xmin,xmax,ymin, ymax;
 
+    Range(int xmi, int xma, int ymi, int yma) : xmin(xmi), xmax(xma), ymin(ymi), ymax(yma) {}
     bool contains(const KDpoint* p) const {
         return p->getY() >= ymin &&
-               p->getY() <= ymax;
+               p->getY() <= ymax &&
+               p->getX() >= xmin &&
+               p->getX() <= xmax;
     }
 };
 
@@ -36,7 +39,7 @@ public:
     KDtree(std::vector<KDnode*> points);
     ~KDtree();
 
-    KDpoint* rmq(int ymax);
+    KDpoint* rmq(int xmax,int ymax);
 
     void printAlbero();
 

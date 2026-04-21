@@ -100,6 +100,7 @@ void solve(std::vector<Anchor>& anchors){
     
     std::vector <PointLineSweep> pti= buildPti(anchors);
     
+    int n_anchors=anchors.size();
     //sweep line
     int n_pti=pti.size();
     
@@ -114,7 +115,7 @@ void solve(std::vector<Anchor>& anchors){
             cerr << "Processing point: (" << pti[i].x << ", " << pti[i].y << ") - id: " << idcurr << endl;
             #endif
 
-            KDpoint* p = tree.rmq(pti[i].y ); 
+            KDpoint* p = tree.rmq(pti[i].x,pti[i].y ); 
 
             if(p != nullptr) {
 
@@ -128,7 +129,21 @@ void solve(std::vector<Anchor>& anchors){
                 Anchor &prev = anchors[idPrec];
                 anchors[idcurr].setPrec(idPrec);
                 
+                cerr << "Predecessor anchor id: " << idPrec << " with coordinates (" << prev.getXbegin() << ", " << prev.getYbegin() << ", " << prev.getXend() << ", " << prev.getYend() << ") and score: " << prev.getScore() << endl;
+
                 //gapcost
+                if(idPrec == 0){
+                    anchors[idcurr].setScore(0);
+                    #ifndef NDEBUG
+                    cerr << "sono entrato" << endl;
+                    cerr << "Best point found: (" << p->getX() << ", " << p->getY() << ") - id: " << idPrec << endl;
+                    cerr << "peso di "<< anchors[idcurr].getId() << " : " << anchors[idcurr].getWeight() << endl;
+                    cerr << "score di "<< anchors[idcurr].getId() << " : " << anchors[idcurr].getScore() << endl;
+                    #endif
+                    continue;
+                }
+                
+
                 int gap = ((anchors[idcurr].getXbegin()-anchors[idPrec].getXend())+(anchors[idcurr].getYbegin()-anchors[idPrec].getYend()));
                 
                 #ifndef NDEBUG
@@ -161,9 +176,11 @@ void solve(std::vector<Anchor>& anchors){
                 continue; // Skip this iteration to avoid out-of-bounds access
             }
             if(kdpoints[idcurr] && kdnodes[idcurr]) {
+                
                 kdpoints[idcurr]->setGc(pti[n_pti-1].x, pti[n_pti-1].y);
                 kdpoints[idcurr]->setPriority(anchors[idcurr].getScore());
                 kdnodes[idcurr]->activate();
+                
             }
             else {
                 cerr << "errore: non esistono kdpoint o kdnodes per l'indice " << idcurr << endl;
