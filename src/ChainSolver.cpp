@@ -104,6 +104,12 @@ void solve(std::vector<Anchor>& anchors){
     //sweep line
     int n_pti=pti.size();
     
+    #ifndef NDEBUG
+    cerr << "numero ancore:" << n_anchors << endl;
+    cerr << "numero pti:" << n_pti << endl;
+    #endif
+
+    int idPrec;
     for(int i=0;i< n_pti; i++){
 
         int idcurr = pti[i].id;
@@ -119,7 +125,7 @@ void solve(std::vector<Anchor>& anchors){
 
             if(p != nullptr) {
 
-                int idPrec = p->getId();
+                idPrec = p->getId();
             
                 if (idPrec <0 || idPrec >= anchors.size() || idcurr < 0 || idcurr >= anchors.size()) {
                     cerr << "Error: idPrec or idcurr out of bounds. idPrec: " << idPrec << ", idcurr: " << idcurr << endl;
@@ -132,10 +138,24 @@ void solve(std::vector<Anchor>& anchors){
                 cerr << "Predecessor anchor id: " << idPrec << " with coordinates (" << prev.getXbegin() << ", " << prev.getYbegin() << ", " << prev.getXend() << ", " << prev.getYend() << ") and score: " << prev.getScore() << endl;
 
                 //gapcost
+
+                //caso prima ancora fittizia
                 if(idPrec == 0){
                     anchors[idcurr].setScore(0);
                     #ifndef NDEBUG
-                    cerr << "sono entrato" << endl;
+                    cerr << "prima ancora fittizia (come predecessore), non calcolo gap cost" << endl;
+                    cerr << "Best point found: (" << p->getX() << ", " << p->getY() << ") - id: " << idPrec << endl;
+                    cerr << "peso di "<< anchors[idcurr].getId() << " : " << anchors[idcurr].getWeight() << endl;
+                    cerr << "score di "<< anchors[idcurr].getId() << " : " << anchors[idcurr].getScore() << endl;
+                    #endif
+                    continue;
+                }
+
+                //caso ultima ancora fittizia
+                if(idcurr == n_anchors-1){
+                    anchors[idcurr].setScore(prev.getScore());
+                    #ifndef NDEBUG
+                    cerr << "ultima ancora fittizia (come successore), non calcolo gap cost" << endl;
                     cerr << "Best point found: (" << p->getX() << ", " << p->getY() << ") - id: " << idPrec << endl;
                     cerr << "peso di "<< anchors[idcurr].getId() << " : " << anchors[idcurr].getWeight() << endl;
                     cerr << "score di "<< anchors[idcurr].getId() << " : " << anchors[idcurr].getScore() << endl;
@@ -174,6 +194,12 @@ void solve(std::vector<Anchor>& anchors){
             if (idcurr < 0 || idcurr >= anchors.size()) {
                 cerr << "Error: idcurr out of bounds. idcurr: " << idcurr << endl;
                 continue; // Skip this iteration to avoid out-of-bounds access
+            }
+            if(idcurr==n_anchors-1){
+                cerr << "idcurr è l'ultima ancora fittizia, assegno stessa priorità della penultima ancora" << endl;
+                kdpoints[idcurr]->setPriority(kdpoints[idPrec]->getPriority());
+                cerr << "priority : " << kdpoints[idcurr]->getPriority() << endl;
+                continue;
             }
             if(kdpoints[idcurr] && kdnodes[idcurr]) {
                 

@@ -19,3 +19,6 @@ void KDnode::setRight(KDnode* r) { right = r; }
 
 void KDnode::setRegion(Box b) { region = b; }
 Box KDnode::getRegion() const { return region; }
+
+void KDnode::setMaxPrioritySubtree(int p) { maxPrioritySubtree = p; }
+int KDnode::getMaxPrioritySubtree() const { return maxPrioritySubtree; }

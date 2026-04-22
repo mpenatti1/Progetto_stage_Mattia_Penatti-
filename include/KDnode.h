@@ -9,12 +9,14 @@ struct Box {
 class KDnode {
 
 private:
+
     KDpoint* point;
     KDnode* left;
     KDnode* right;
     int axis;
     bool active;
-    Box region;        
+    Box region;  
+    int maxPrioritySubtree;      
 public:
 
     KDnode(KDpoint* p);
@@ -32,7 +34,10 @@ public:
     void activate();
 
     void setRegion(Box b);   
-    Box getRegion() const;   
+    void setMaxPrioritySubtree(int p);
+
+    Box getRegion() const;  
+    int getMaxPrioritySubtree() const;
     ~KDnode() {
 }
 };

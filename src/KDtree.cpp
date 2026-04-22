@@ -13,10 +13,9 @@ bool fullyInside(const Box& a, const Range& R) {
 
 bool intersects(const Box& a, const Range& R) {
     
-    bool Xsovrapposto = (a.xmax >= R.xmin && a.xmin <= R.xmax);
-    bool Ysovrapposto = (a.ymax >= R.ymin && a.ymin <= R.ymax);
+    bool Xsovrapposto = !(a.xmax < R.xmin || a.xmin > R.xmax);
+    bool Ysovrapposto = !(a.ymax < R.ymin || a.ymin > R.ymax);
     
-
     return Ysovrapposto && Xsovrapposto;
 }
 
@@ -32,7 +31,7 @@ KDnode* KDtree::buildTree(std::vector<KDnode*>& p, int depth) {
     Box b;
     b.xmin = b.xmax = pt->getX();
     b.ymin = b.ymax = pt->getY();
-
+    node->setMaxPrioritySubtree(pt->getPriority());
     node->setRegion(b); 
 
     return node;
@@ -80,12 +79,15 @@ else {
     b.xmin = b.xmax = pt->getX();
     b.ymin = b.ymax = pt->getY();
 
+    int best = node->getPoint()->getPriority();
+
     if (L) {
         Box bl = L->getRegion();
         b.xmin = std::min(b.xmin, bl.xmin);
         b.xmax = std::max(b.xmax, bl.xmax);
         b.ymin = std::min(b.ymin, bl.ymin);
         b.ymax = std::max(b.ymax, bl.ymax);
+        best = std::max(best, L->getMaxPrioritySubtree());
     }
 
     if (R) {
@@ -94,8 +96,10 @@ else {
         b.xmax = std::max(b.xmax, br.xmax);
         b.ymin = std::min(b.ymin, br.ymin);
         b.ymax = std::max(b.ymax, br.ymax);
+        best = std::max(best, R->getMaxPrioritySubtree());
     }
 
+    node->setMaxPrioritySubtree(best);
     node->setRegion(b);
 
     return node;
@@ -105,9 +109,14 @@ else {
 void KDtree::reportSubtree(KDnode* v, KDpoint*& best) {
     if (!v) return;
 
+    if (best && v->getMaxPrioritySubtree() <= best->getPriority())
+    return;
+
     KDpoint* p = v->getPoint();
     if (v->isActive() && (!best || p->getPriority() >= best->getPriority()))
         best = p;
+    
+    
 
     reportSubtree(v->getLeft(), best);
     reportSubtree(v->getRight(), best);
@@ -119,9 +128,17 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
     
     if (!v) return;
 
+    if (fullyInside(v->getRegion(), R)) {
+        reportSubtree(v, best);
+        return;  // Non serve scendere ulteriormente
+    }
+
     //pruning globale
     if (!intersects(v->getRegion(), R))
         return;
+
+    if (best && v->getMaxPrioritySubtree() <= best->getPriority())
+    return;
 
     KDpoint* p = v->getPoint();
     if ((v->isActive() && p->getY() <= R.ymax)) {
