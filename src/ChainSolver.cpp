@@ -105,6 +105,12 @@ void solve(std::vector<Anchor>& anchors){
     int n_pti=pti.size();
     
     #ifndef NDEBUG
+        for(int i=0;i<kdnodes.size();i++){
+            cerr << "KDnode " << i << " -> point id: " << kdnodes[i]->getPoint()->getId() << " with coordinates (" << kdnodes[i]->getPoint()->getX() << ", " << kdnodes[i]->getPoint()->getY() << ")" << endl;
+        }
+
+    #endif
+    #ifndef NDEBUG
     cerr << "numero ancore:" << n_anchors << endl;
     cerr << "numero pti:" << n_pti << endl;
     #endif
@@ -135,7 +141,7 @@ void solve(std::vector<Anchor>& anchors){
                 Anchor &prev = anchors[idPrec];
                 anchors[idcurr].setPrec(idPrec);
                 
-                cerr << "Predecessor anchor id: " << idPrec << " with coordinates (" << prev.getXbegin() << ", " << prev.getYbegin() << ", " << prev.getXend() << ", " << prev.getYend() << ") and score: " << prev.getScore() << endl;
+                cerr << "Predecessor anchor id: " << idPrec << " with coordinates (" << prev.getXbegin() << ", " << prev.getYbegin() << ", " << prev.getXend() << ", " << prev.getYend() << ") and priority: " << kdpoints[idPrec]->getPriority() << endl;
 
                 //gapcost
 
@@ -150,19 +156,10 @@ void solve(std::vector<Anchor>& anchors){
                     #endif
                     continue;
                 }
-
-                //caso ultima ancora fittizia
                 if(idcurr == n_anchors-1){
                     anchors[idcurr].setScore(prev.getScore());
-                    #ifndef NDEBUG
-                    cerr << "ultima ancora fittizia (come successore), non calcolo gap cost" << endl;
-                    cerr << "Best point found: (" << p->getX() << ", " << p->getY() << ") - id: " << idPrec << endl;
-                    cerr << "peso di "<< anchors[idcurr].getId() << " : " << anchors[idcurr].getWeight() << endl;
-                    cerr << "score di "<< anchors[idcurr].getId() << " : " << anchors[idcurr].getScore() << endl;
-                    #endif
                     continue;
                 }
-                
 
                 int gap = ((anchors[idcurr].getXbegin()-anchors[idPrec].getXend())+(anchors[idcurr].getYbegin()-anchors[idPrec].getYend()));
                 
@@ -216,7 +213,10 @@ void solve(std::vector<Anchor>& anchors){
             cerr << "\nEND"<< endl;
             cerr << "Processing point: (" << pti[i].x << ", " << pti[i].y << ") - id: " << idcurr << endl;
             cerr << "priority : " << kdpoints[idcurr]->getPriority() << endl;
+            
             #endif
+            tree.updateMaxPriority(kdnodes[idcurr]);
+
             
         }
 
@@ -239,6 +239,7 @@ void solve(std::vector<Anchor>& anchors){
     printChainRec(anchors.back(), anchors);
     cout << "Score totale: " << anchors.back().getScore() << endl;
 
+    
     //distruggo kdpoints
     for (auto p : kdpoints)
     delete p;

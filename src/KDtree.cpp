@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
-
+#include <limits>
 
 bool fullyInside(const Box& a, const Range& R) {
     return (a.ymin >= R.ymin && a.ymax <= R.ymax && a.xmin >= R.xmin && a.xmax <= R.xmax);
@@ -27,7 +27,8 @@ KDnode* KDtree::buildTree(std::vector<KDnode*>& p, int depth) {
     KDnode* node = p[0];
 
     KDpoint* pt = node->getPoint();
-
+    int axis= depth % 2;
+    node->setAsse(axis);
     Box b;
     b.xmin = b.xmax = pt->getX();
     b.ymin = b.ymax = pt->getY();
@@ -71,6 +72,9 @@ else {
 
     node->setLeft(L);
     node->setRight(R);
+    if (L) L->setParent(node);
+    if (R) R->setParent(node);
+    
 
     //buonding box
     Box b;
@@ -109,8 +113,8 @@ else {
 void KDtree::reportSubtree(KDnode* v, KDpoint*& best) {
     if (!v) return;
 
-    if (best && v->getMaxPrioritySubtree() <= best->getPriority())
-    return;
+    /*if (best && v->getMaxPrioritySubtree() <= best->getPriority())
+    return;*/
 
     KDpoint* p = v->getPoint();
     if (v->isActive() && (!best || p->getPriority() >= best->getPriority()))
@@ -182,6 +186,33 @@ KDpoint* KDtree::rmq(int xmax,int ymax) {
     return best;
 }
 
+
+void KDtree::updateMaxPriority(KDnode* node) {
+   
+    while (node) {
+
+    int maxPriority = std::numeric_limits<int>::min();
+
+    if (node->isActive())
+        maxPriority = node->getPoint()->getPriority();
+
+    if (node->getLeft())
+        maxPriority = std::max(maxPriority, node->getLeft()->getMaxPrioritySubtree());
+
+    if (node->getRight())
+        maxPriority = std::max(maxPriority, node->getRight()->getMaxPrioritySubtree());
+
+    #ifndef NDEBUG
+
+        if (node->isActive()) {
+            std::cerr << "Updated max priority for node with point (" << node->getPoint()->getX() << "," << node->getPoint()->getY() << ") with priority : " << node->getPoint()->getPriority() << " to: " << maxPriority << std::endl;
+        }
+        #endif
+    node->setMaxPrioritySubtree(maxPriority);
+
+    node = node->getParent();
+    }
+}
 
 void KDtree::printGraph(KDnode* node, int depth) {
 

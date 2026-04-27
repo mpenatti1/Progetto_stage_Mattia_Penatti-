@@ -16,6 +16,8 @@ private:
     int axis;
     bool active;
     Box region;  
+
+    KDnode* parent;
     int maxPrioritySubtree;      
 public:
 
@@ -31,6 +33,10 @@ public:
     void setAsse(int a);
     void setLeft(KDnode* l);
     void setRight(KDnode* r);
+
+    void setParent(KDnode* p);
+    KDnode* getParent() const;
+    
     void activate();
 
     void setRegion(Box b);   

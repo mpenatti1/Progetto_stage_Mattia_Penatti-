@@ -10,6 +10,7 @@ struct Range {
     int xmin,xmax,ymin, ymax;
 
     Range(int xmi, int xma, int ymi, int yma) : xmin(xmi), xmax(xma), ymin(ymi), ymax(yma) {}
+    
     bool contains(const KDpoint* p) const {
         return p->getY() >= ymin &&
                p->getY() <= ymax &&
@@ -40,6 +41,8 @@ public:
     ~KDtree();
 
     KDpoint* rmq(int xmax,int ymax);
+
+    void updateMaxPriority(KDnode* node);
 
     void printAlbero();
 

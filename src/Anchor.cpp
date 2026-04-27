@@ -7,7 +7,7 @@
             y_begin=yb;
             y_end=ye;
             id=i;
-            weight=w; 
+            weight=(xe-xb)*(ye-yb); 
             score=0;
             prec=-1;
         }
