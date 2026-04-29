@@ -14,7 +14,7 @@ debug_base.txt
 
 longest_chain.txt
 longest_chain_opt.txt
-longest_chain_debug.txt
+longest_chain_base.txt
 
 *.sh
 *.tmp
