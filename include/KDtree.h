@@ -4,7 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
-
+#include "config.h"
 
 struct Range {
     int xmin,xmax,ymin, ymax;
@@ -42,7 +42,9 @@ public:
 
     KDpoint* rmq(int xmax,int ymax);
 
+    #ifdef USE_MAX_PRIORITY
     void updateMaxPriority(KDnode* node);
+    #endif
 
     void printAlbero();
 

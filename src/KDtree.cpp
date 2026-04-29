@@ -32,7 +32,9 @@ KDnode* KDtree::buildTree(std::vector<KDnode*>& p, int depth) {
     Box b;
     b.xmin = b.xmax = pt->getX();
     b.ymin = b.ymax = pt->getY();
+    #ifdef USE_MAX_PRIORITY
     node->setMaxPrioritySubtree(pt->getPriority());
+    #endif
     node->setRegion(b); 
 
     return node;
@@ -91,7 +93,9 @@ else {
         b.xmax = std::max(b.xmax, bl.xmax);
         b.ymin = std::min(b.ymin, bl.ymin);
         b.ymax = std::max(b.ymax, bl.ymax);
+        #ifdef USE_MAX_PRIORITY
         best = std::max(best, L->getMaxPrioritySubtree());
+        #endif
     }
 
     if (R) {
@@ -100,10 +104,14 @@ else {
         b.xmax = std::max(b.xmax, br.xmax);
         b.ymin = std::min(b.ymin, br.ymin);
         b.ymax = std::max(b.ymax, br.ymax);
+        #ifdef USE_MAX_PRIORITY
         best = std::max(best, R->getMaxPrioritySubtree());
+        #endif
     }
 
+    #ifdef USE_MAX_PRIORITY
     node->setMaxPrioritySubtree(best);
+    #endif
     node->setRegion(b);
 
     return node;
@@ -113,8 +121,10 @@ else {
 void KDtree::reportSubtree(KDnode* v, KDpoint*& best) {
     if (!v) return;
 
-    /*if (best && v->getMaxPrioritySubtree() <= best->getPriority())
-    return;*/
+    #ifdef USE_MAX_PRIORITY
+    if (best && v->getMaxPrioritySubtree() <= best->getPriority())
+    return;
+    #endif
 
     KDpoint* p = v->getPoint();
     if (v->isActive() && (!best || p->getPriority() >= best->getPriority()))
@@ -141,9 +151,11 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
     if (!intersects(v->getRegion(), R))
         return;
 
+    #ifdef USE_MAX_PRIORITY
     if (best && v->getMaxPrioritySubtree() <= best->getPriority())
     return;
-
+    #endif
+    
     KDpoint* p = v->getPoint();
     if ((v->isActive() && p->getY() <= R.ymax)) {
         if (!best || p->getPriority() >= best->getPriority())
@@ -187,6 +199,7 @@ KDpoint* KDtree::rmq(int xmax,int ymax) {
 }
 
 
+#ifdef USE_MAX_PRIORITY
 void KDtree::updateMaxPriority(KDnode* node) {
    
     while (node) {
@@ -213,7 +226,7 @@ void KDtree::updateMaxPriority(KDnode* node) {
     node = node->getParent();
     }
 }
-
+#endif
 void KDtree::printGraph(KDnode* node, int depth) {
 
     if (!node)

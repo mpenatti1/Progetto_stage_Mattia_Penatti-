@@ -141,8 +141,9 @@ void solve(std::vector<Anchor>& anchors){
                 Anchor &prev = anchors[idPrec];
                 anchors[idcurr].setPrec(idPrec);
                 
+                #ifndef NDEBUG
                 cerr << "Predecessor anchor id: " << idPrec << " with coordinates (" << prev.getXbegin() << ", " << prev.getYbegin() << ", " << prev.getXend() << ", " << prev.getYend() << ") and priority: " << kdpoints[idPrec]->getPriority() << endl;
-
+                #endif
                 //gapcost
 
                 //caso prima ancora fittizia
@@ -193,7 +194,9 @@ void solve(std::vector<Anchor>& anchors){
                 continue; // Skip this iteration to avoid out-of-bounds access
             }
             if(idcurr==n_anchors-1){
+                #ifndef NDEBUG
                 cerr << "idcurr è l'ultima ancora fittizia, assegno stessa priorità della penultima ancora" << endl;
+                #endif
                 kdpoints[idcurr]->setPriority(kdpoints[idPrec]->getPriority());
                 cerr << "priority : " << kdpoints[idcurr]->getPriority() << endl;
                 continue;
@@ -215,7 +218,9 @@ void solve(std::vector<Anchor>& anchors){
             cerr << "priority : " << kdpoints[idcurr]->getPriority() << endl;
             
             #endif
+            #ifdef USE_MAX_PRIORITY
             tree.updateMaxPriority(kdnodes[idcurr]);
+            #endif
 
             
         }

@@ -15,7 +15,7 @@ class Anchor{
 
         Anchor ();
         
-        Anchor(int xb, int yb, int xe, int ye, int w, int i);
+        Anchor(int xb, int xe, int yb, int ye, int w, int i);
 
         int getXbegin() const;
         int getYbegin() const;

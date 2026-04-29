@@ -1,28 +1,51 @@
 CXX = g++
-CXXFLAGS = -g -O0 -Iinclude
 
 SRC = src/Main.cpp src/Anchor.cpp src/ChainSolver.cpp src/KDnode.cpp src/KDpoint.cpp src/KDtree.cpp src/ReadAnchors.cpp
 OBJDIR = build
-OBJ = $(patsubst src/%.cpp,$(OBJDIR)/src/%.o,$(SRC))
 
-TARGET = maximalColinearChaining
+TARGET_BASE = maximalColinearChaining
+TARGET_OPT  = maximalColinearChaining_opt
 
+# -----------------------
+# DEFAULT SETTINGS
+# -----------------------
+BUILD ?= base
+MODE ?= debug
+
+# -----------------------
+# FLAGS
+# -----------------------
+CXXFLAGS_DEBUG = -g -O0 -Iinclude
+CXXFLAGS_RELEASE = -O3 -Iinclude -DNDEBUG
+
+ifeq ($(MODE),debug)
+    CXXFLAGS = $(CXXFLAGS_DEBUG)
+else
+    CXXFLAGS = $(CXXFLAGS_RELEASE)
+endif
+
+ifeq ($(BUILD),opt)
+    CXXFLAGS += -DUSE_MAX_PRIORITY
+    TARGET = $(TARGET_OPT)
+    OBJDIR_BUILD = $(OBJDIR)/opt
+else
+    TARGET = $(TARGET_BASE)
+    OBJDIR_BUILD = $(OBJDIR)/base
+endif
+
+OBJ = $(patsubst src/%.cpp,$(OBJDIR_BUILD)/%.o,$(SRC))
+
+# -----------------------
+# RULES
+# -----------------------
 all: $(TARGET)
-
-release: CXXFLAGS = -g -O0 -DNDEBUG -Iinclude
-release : $(TARGET)
-
-
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
-
 
 $(TARGET): $(OBJ)
 	$(CXX) $(OBJ) -o $(TARGET)
 
-$(OBJDIR)/src/%.o: src/%.cpp | $(OBJDIR)
+$(OBJDIR_BUILD)/%.o: src/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(OBJDIR) $(TARGET)
+	rm -rf $(OBJDIR) $(TARGET_BASE) $(TARGET_OPT)

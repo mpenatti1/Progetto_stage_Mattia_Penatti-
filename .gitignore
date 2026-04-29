@@ -2,10 +2,21 @@
 build/
 dist/
 out/
+test/
+test_reali/
 
 maximalColinearChaining
+maximalColinearChaining_opt
+
 debug.txt
+debug_opt.txt
+debug_base.txt
+
 longest_chain.txt
+longest_chain_opt.txt
+longest_chain_debug.txt
+
+*.sh
 *.tmp
 *.log
 

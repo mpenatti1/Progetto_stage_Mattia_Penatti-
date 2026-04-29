@@ -1,13 +1,13 @@
 #include "Anchor.h"
 
-    Anchor::Anchor() : x_begin(0), y_begin(0), x_end(0), y_end(0), weight(0), id(0){}
-    Anchor::Anchor(int xb,int yb,int xe,int ye,int w, int i){
+    Anchor::Anchor() : x_begin(0), x_end(0), y_begin(0), y_end(0), weight(0), id(0){}
+    Anchor::Anchor(int xb,int xe,int yb,int ye,int w, int i){
             x_begin=xb;
             x_end=xe;
             y_begin=yb;
             y_end=ye;
             id=i;
-            weight=(xe-xb)*(ye-yb); 
+            weight=w; 
             score=0;
             prec=-1;
         }
