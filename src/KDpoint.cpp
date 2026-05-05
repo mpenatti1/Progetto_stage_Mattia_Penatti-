@@ -1,8 +1,8 @@
 #include "KDpoint.h"
-
+#include <limits>
     KDpoint::KDpoint(int xe,int ye,int i)
         : x(xe), y(ye), id(i),
-           gc(0), priority(0) {}
+           gc(0), priority(std::numeric_limits<int>::min()) {}
 
     int KDpoint::getX() const { return x; }
     int KDpoint::getY() const { return y; }

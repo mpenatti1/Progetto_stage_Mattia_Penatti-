@@ -20,57 +20,58 @@ bool intersects(const Box& a, const Range& R) {
 }
 
 
-KDnode* KDtree::buildTree(std::vector<KDnode*>& p, int depth) {
+KDnode* KDtree::buildTree(std::vector<KDnode*>& p, int left, int right, int depth) {
+    
+    if (left > right) return nullptr;
 
-    if (p.empty()) return nullptr;
-    if (p.size() == 1) {
-    KDnode* node = p[0];
+    if(left==right){
 
-    KDpoint* pt = node->getPoint();
-    int axis= depth % 2;
-    node->setAsse(axis);
-    Box b;
-    b.xmin = b.xmax = pt->getX();
-    b.ymin = b.ymax = pt->getY();
-    #ifdef USE_MAX_PRIORITY
-    node->setMaxPrioritySubtree(pt->getPriority());
-    #endif
-    node->setRegion(b); 
+        KDnode* node=p[left];
+        KDpoint* pt = node->getPoint();
+        int axis = depth % 2;
+        node->setAsse(axis);
+        Box b;
+        b.xmin = b.xmax = pt->getX();
+        b.ymin = b.ymax = pt->getY();
+        #ifdef USE_MAX_PRIORITY
+        node->setMaxPrioritySubtree(std::numeric_limits<int>::min());
+        #endif
+        node->setRegion(b);
+        return node;
+    }
 
-    return node;
-}
     int axis = depth % 2;
 
     // Ordina per asse
-    int mid = p.size() / 2;
+    int mid = left + (right - left)/2;
 
-if (axis == 0) {
-    std::nth_element(
-        p.begin(),
-        p.begin() + mid,
-        p.end(),
-        [](KDnode* a, KDnode* b) {
-            return a->getPoint()->getX() < b->getPoint()->getX();
-        });
-} 
-else {
-    std::nth_element(
-        p.begin(),
-        p.begin() + mid,
-        p.end(),
-        [](KDnode* a, KDnode* b) {
-            return a->getPoint()->getY() < b->getPoint()->getY();
-        });
-}
+    
+    if (axis == 0) {
+        std::nth_element(
+            p.begin() + left,
+            p.begin() + mid,
+            p.begin() + right + 1,
+            [](KDnode* a, KDnode* b) {
+                return a->getPoint()->getX() < b->getPoint()->getX();
+            });
+    } 
+    else {
+        std::nth_element(
+            p.begin() + left,
+            p.begin() + mid,
+            p.begin() + right + 1,
+            [](KDnode* a, KDnode* b) {
+                return a->getPoint()->getY() < b->getPoint()->getY();
+            });
+    }
 
     KDnode* node = p[mid];
     node->setAsse(axis);
 
-    std::vector<KDnode*> p1(p.begin(), p.begin() + mid);
-    std::vector<KDnode*> p2(p.begin() + mid + 1, p.end());
+    
 
-    KDnode* L = buildTree(p1, depth + 1);
-    KDnode* R = buildTree(p2, depth + 1);
+    KDnode* L = buildTree(p, left, mid - 1, depth + 1);
+    KDnode* R = buildTree(p, mid + 1, right, depth + 1);
 
     node->setLeft(L);
     node->setRight(R);
@@ -78,14 +79,14 @@ else {
     if (R) R->setParent(node);
     
 
-    //buonding box
+    //bounding box
     Box b;
     KDpoint* pt = node->getPoint();
 
     b.xmin = b.xmax = pt->getX();
     b.ymin = b.ymax = pt->getY();
 
-    int best = node->getPoint()->getPriority();
+    //int best = node->getPoint()->getPriority();
 
     if (L) {
         Box bl = L->getRegion();
@@ -93,9 +94,9 @@ else {
         b.xmax = std::max(b.xmax, bl.xmax);
         b.ymin = std::min(b.ymin, bl.ymin);
         b.ymax = std::max(b.ymax, bl.ymax);
-        #ifdef USE_MAX_PRIORITY
+        /*#ifdef USE_MAX_PRIORITY
         best = std::max(best, L->getMaxPrioritySubtree());
-        #endif
+        #endif*/
     }
 
     if (R) {
@@ -104,33 +105,54 @@ else {
         b.xmax = std::max(b.xmax, br.xmax);
         b.ymin = std::min(b.ymin, br.ymin);
         b.ymax = std::max(b.ymax, br.ymax);
-        #ifdef USE_MAX_PRIORITY
+        /*#ifdef USE_MAX_PRIORITY
         best = std::max(best, R->getMaxPrioritySubtree());
-        #endif
+        #endif*/
     }
 
     #ifdef USE_MAX_PRIORITY
-    node->setMaxPrioritySubtree(best);
+    node->setMaxPrioritySubtree(std::numeric_limits<int>::min());
     #endif
     node->setRegion(b);
 
     return node;
 }
 
+///////////////////
+    #ifndef NDEBUG
+    int KDtree::countSubtree(KDnode* node) {
+        if (!node) return 0;
+        return 1 + countSubtree(node->getLeft()) + countSubtree(node->getRight());
+}
+    int KDtree::countSubtreePriority(KDnode* node) {
+        if (!node) return 0;
+        return 1 + countSubtreePriority(node->getLeft()) + countSubtreePriority(node->getRight());
+}
+    #endif
+
+//////////////////
+
 
 void KDtree::reportSubtree(KDnode* v, KDpoint*& best) {
     if (!v) return;
 
     #ifdef USE_MAX_PRIORITY
-    if (best && v->getMaxPrioritySubtree() <= best->getPriority())
-    return;
+    if (best && v->getMaxPrioritySubtree() <= best->getPriority()){
+        #ifndef NDEBUG
+        pruned_maxpriority+= countSubtreePriority(v);
+        #endif
+        return;
+}
     #endif
 
     KDpoint* p = v->getPoint();
+    
     if (v->isActive() && (!best || p->getPriority() >= best->getPriority()))
         best = p;
     
-    
+    #ifndef NDEBUG
+    visited_nodes++;
+    #endif
 
     reportSubtree(v->getLeft(), best);
     reportSubtree(v->getRight(), best);
@@ -142,26 +164,39 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
     
     if (!v) return;
 
+    
+
+    //pruning globale
+    if (!intersects(v->getRegion(), R)){
+        #ifndef NDEBUG
+        pruned_nodes+= countSubtree(v);
+        #endif
+        return;
+    }
+
+    #ifdef USE_MAX_PRIORITY
+    if (best && v->getMaxPrioritySubtree() <= best->getPriority()){
+        #ifndef NDEBUG
+        pruned_maxpriority+= countSubtreePriority(v);
+        #endif
+        return;
+}
+    #endif
+
     if (fullyInside(v->getRegion(), R)) {
         reportSubtree(v, best);
         return;  // Non serve scendere ulteriormente
     }
 
-    //pruning globale
-    if (!intersects(v->getRegion(), R))
-        return;
-
-    #ifdef USE_MAX_PRIORITY
-    if (best && v->getMaxPrioritySubtree() <= best->getPriority())
-    return;
-    #endif
+    visited_nodes++;
+    
     
     KDpoint* p = v->getPoint();
     if ((v->isActive() && p->getY() <= R.ymax)) {
         if (!best || p->getPriority() >= best->getPriority())
             best = p;
     }
-
+    
     //figlio sinistro
     if (v->getLeft()) {
         Box L = v->getLeft()->getRegion();
@@ -172,6 +207,9 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
         else if (intersects(L, R)) {
             rmqRec(v->getLeft(), R, best);
         }
+        #ifndef NDEBUG
+        else pruned_nodes+= countSubtree(v->getLeft());
+        #endif
     }
 
     //figlo destro
@@ -184,17 +222,28 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
         else if (intersects(Rb, R)) {
             rmqRec(v->getRight(), R, best);
         }
+        #ifndef NDEBUG
+        else pruned_nodes+= countSubtree(v->getRight());
+        #endif
     }
 }
 
 KDpoint* KDtree::rmq(int xmax,int ymax) {
 
+    pruned_maxpriority=0;
+    pruned_nodes=0;
+    visited_nodes=0;
     Range R{0,xmax,0, ymax};
 
     KDpoint* best = nullptr;
 
     rmqRec(root, R, best);
 
+    #ifndef NDEBUG
+    std::cerr << "PRUNED MAXPRIORITY: " << pruned_maxpriority << "\n";
+    std::cerr << "PRUNED NODES: " << pruned_nodes << "\n";
+    std::cerr << "VISITED NODES: " << visited_nodes << "\n";
+    #endif
     return best;
 }
 
@@ -220,7 +269,8 @@ void KDtree::updateMaxPriority(KDnode* node) {
         if (node->isActive()) {
             std::cerr << "Updated max priority for node with point (" << node->getPoint()->getX() << "," << node->getPoint()->getY() << ") with priority : " << node->getPoint()->getPriority() << " to: " << maxPriority << std::endl;
         }
-        #endif
+    #endif
+
     node->setMaxPrioritySubtree(maxPriority);
 
     node = node->getParent();
@@ -248,7 +298,7 @@ void KDtree::printAlbero() { printGraph(root, 0); }
 
 
 KDtree::KDtree(std::vector<KDnode*> points) {
-    root = buildTree(points, 0);
+    root = buildTree(points, 0, points.size() - 1, 0);
 }
 
 void KDtree::destroy(KDnode* node) {

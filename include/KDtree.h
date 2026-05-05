@@ -8,7 +8,7 @@
 
 struct Range {
     int xmin,xmax,ymin, ymax;
-
+    
     Range(int xmi, int xma, int ymi, int yma) : xmin(xmi), xmax(xma), ymin(ymi), ymax(yma) {}
     
     bool contains(const KDpoint* p) const {
@@ -24,8 +24,11 @@ class KDtree {
 
 private:
     KDnode* root;
+    
+    long pruned_maxpriority, pruned_nodes,visited_nodes;
+    
 
-    KDnode* buildTree(std::vector<KDnode*>& p, int depth);
+    KDnode* buildTree(std::vector<KDnode*>& p,int left, int right, int depth);
 
     void rmqRec(KDnode* node, Range& R, KDpoint*& best);
 
@@ -35,6 +38,10 @@ private:
 
     void destroy(KDnode* node);
 
+    ///////
+    int countSubtree(KDnode* node);
+    int countSubtreePriority(KDnode* node);
+    ///////
 public:
 
     KDtree(std::vector<KDnode*> points);
