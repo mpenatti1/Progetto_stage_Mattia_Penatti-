@@ -4,6 +4,7 @@ dist/
 out/
 test/
 test_reali/
+risultati/
 
 maximalColinearChaining
 maximalColinearChaining_opt

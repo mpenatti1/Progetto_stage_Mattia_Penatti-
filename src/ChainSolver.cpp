@@ -114,12 +114,16 @@ void solve(std::vector<Anchor>& anchors){
     cerr << "numero ancore:" << n_anchors << endl;
     cerr << "numero pti:" << n_pti << endl;
     #endif
-
+    int c=1;
     int idPrec;
     for(int i=0;i< n_pti; i++){
 
         int idcurr = pti[i].id;
 
+        if(i==n_pti*c/100){
+            c++;
+            cerr << "Progress: " << (i*100)/n_pti << "%\n";
+        }
         if(pti[i].isBegin){
             
             #ifndef NDEBUG
