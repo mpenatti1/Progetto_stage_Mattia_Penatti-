@@ -18,7 +18,8 @@ private:
     Box region;  
 
     KDnode* parent;
-    int maxPrioritySubtree;      
+    KDnode* maxPrioritySubtree;
+    //int maxPrioritySubtree;      
 public:
 
     KDnode(KDpoint* p);
@@ -40,10 +41,10 @@ public:
     void activate();
 
     void setRegion(Box b);   
-    void setMaxPrioritySubtree(int p);
+    void setMaxPrioritySubtree(KDnode* node);
 
     Box getRegion() const;  
-    int getMaxPrioritySubtree() const;
+    KDnode* getMaxPrioritySubtree() const;
     ~KDnode() {
 }
 };
