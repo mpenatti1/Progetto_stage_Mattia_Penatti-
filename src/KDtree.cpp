@@ -7,6 +7,8 @@
 #include <fstream>
 #include <limits>
 
+//VERSIONE BASE
+
 bool fullyInside(const Box& a, const Range& R) {
     return (a.ymin >= R.ymin && a.ymax <= R.ymax && a.xmin >= R.xmin && a.xmax <= R.xmax);
 }
