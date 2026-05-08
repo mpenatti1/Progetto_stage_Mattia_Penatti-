@@ -210,39 +210,82 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
     KDnode* left = v->getLeft();
     KDnode* right = v->getRight();
 
-    auto getPriority = [](KDnode* n) {
-        return (n && n->getMaxPrioritySubtree())
-            ? n->getMaxPrioritySubtree()->getPoint()->getPriority()
-            : std::numeric_limits<int>::min();
-    };
+    int leftPriority = 
+        left ? left->getMaxPrioritySubtreeValue() : std::numeric_limits<int>::min();
+    int rightPriority = 
+        right ? right->getMaxPrioritySubtreeValue() : std::numeric_limits<int>::min();
 
     // funzione helper per visitare un figlio (evita duplicazione codice)
-    auto processChild = [&](KDnode* child) {
-        if (!child) return;
+    if (leftPriority >= rightPriority){
 
-        Box b = child->getRegion();
+        if (left){
 
-        if (fullyInside(b, R)) {
-            reportSubtree(child, best);
-        }
-        else if (intersects(b, R)) {
-            rmqRec(child, R, best);
-        }
-        #ifndef NDEBUG
-        else {
-            pruned_nodes += countSubtree(child);
-        }
-        #endif
-};
+            const Box& b =left->getRegion();
+            if(fullyInside(b, R)){
+                reportSubtree(left, best);
+            }
+            else if (intersects(b, R)){
+                rmqRec(left, R, best);
+            }
+            else{
+                #ifndef NDEBUG
+                pruned_nodes+= countSubtree(left);
+                #endif
+            }
 
-// visita prima il figlio con priorità maggiore
-if (getPriority(left) > getPriority(right)) {
-    processChild(left);
-    processChild(right);
-} else {
-    processChild(right);
-    processChild(left);
-}
+        }
+        if (right){
+
+            const Box& b = right->getRegion();
+            if(fullyInside(b, R)){
+                reportSubtree(right, best);
+            }
+            else if (intersects(b, R)){
+                rmqRec(right, R, best);
+            }
+            else{
+                #ifndef NDEBUG
+                pruned_nodes+= countSubtree(right);
+                #endif
+            }
+
+        }
+    }
+    else{
+        if (right){
+
+            const Box& b = right->getRegion();
+            if(fullyInside(b, R)){
+                reportSubtree(right, best);
+            }
+            else if (intersects(b, R)){
+                rmqRec(right, R, best);
+            }
+            else{
+                #ifndef NDEBUG
+                pruned_nodes+= countSubtree(right);
+                #endif
+            }
+
+        }
+        if (left){
+
+            const Box& b = left->getRegion();
+            if(fullyInside(b, R)){
+                reportSubtree(left, best);
+            }
+            else if (intersects(b, R)){
+                rmqRec(left, R, best);
+            }
+            else{
+                #ifndef NDEBUG
+                pruned_nodes+= countSubtree(left);
+                #endif
+            }
+
+        }
+    }
+
 }
 
 KDpoint* KDtree::rmq(int xmax,int ymax) {
@@ -273,29 +316,32 @@ void KDtree::updateMaxPriority(KDnode* node) {
         int maxPriority = std::numeric_limits<int>::min();
         KDnode * best= node;
 
-        if (node->isActive())
+        if (node->isActive()){
             best= node;
-
-        if (node->getLeft() && node->getLeft()->getMaxPrioritySubtree()) {
-            KDnode* leftBest = node->getLeft()->getMaxPrioritySubtree();
-            if (!best || leftBest->getPoint()->getPriority() > best->getPoint()->getPriority())
-                best = leftBest;
-}
-
-        if (node->getRight() && node->getRight()->getMaxPrioritySubtree()) {
-            KDnode* rightBest = node->getRight()->getMaxPrioritySubtree();
-            if (!best || rightBest->getPoint()->getPriority() > best->getPoint()->getPriority())
-                best = rightBest;
-}
-    #ifndef NDEBUG
-        if (node->isActive()) {
-            //std::cerr << "Updated max priority for node with point (" << node->getPoint()->getX() << "," << node->getPoint()->getY() << ") with priority : " << node->getPoint()->getPriority() << " to: " << maxPriority << std::endl;
+            maxPriority =best->getPoint()->getPriority();
         }
-    #endif
+        KDnode* left = node->getLeft();
+        if(left && left->getMaxPrioritySubtree() &&left->getMaxPrioritySubtreeValue() > maxPriority){
+           
+            best = left->getMaxPrioritySubtree();
+            maxPriority = left->getMaxPrioritySubtreeValue();
+        }
 
-    node->setMaxPrioritySubtree(best);
+        KDnode* right = node->getRight();
+        if(right && right->getMaxPrioritySubtree() && right->getMaxPrioritySubtreeValue() > maxPriority){
+            best = right->getMaxPrioritySubtree();
+            maxPriority = right->getMaxPrioritySubtreeValue();
+        }
 
-    node = node->getParent();
+        #ifndef NDEBUG
+            if (node->isActive()) {
+                //std::cerr << "Updated max priority for node with point (" << node->getPoint()->getX() << "," << node->getPoint()->getY() << ") with priority : " << node->getPoint()->getPriority() << " to: " << maxPriority << std::endl;
+            }
+        #endif
+
+        node->setMaxPrioritySubtree(best);
+        node->setMaxPrioritySubtreeValue(maxPriority);
+        node = node->getParent();
     }
 }
 #endif

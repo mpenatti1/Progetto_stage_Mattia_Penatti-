@@ -22,6 +22,9 @@ void KDnode::setParent(KDnode* p) { parent = p; }
 void KDnode::setRegion(Box b) { region = b; }
 Box KDnode::getRegion() const { return region; }
 
+
 void KDnode::setMaxPrioritySubtree(KDnode* p) { maxPrioritySubtree = p; }
+void KDnode::setMaxPrioritySubtreeValue(int value) { maxPrioritySubtreeValue = value; }
 KDnode* KDnode::getMaxPrioritySubtree() const { return maxPrioritySubtree; }
+int KDnode::getMaxPrioritySubtreeValue() const { return maxPrioritySubtreeValue; }
 

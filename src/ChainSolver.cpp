@@ -106,12 +106,12 @@ void solve(std::vector<Anchor>& anchors){
     //sweep line
     int n_pti=pti.size();
     
-    #ifndef NDEBUG
+    /*#ifndef NDEBUG
         for(int i=0;i<kdnodes.size();i++){
             cerr << "KDnode " << i << " -> point id: " << kdnodes[i]->getPoint()->getId() << " with coordinates (" << kdnodes[i]->getPoint()->getX() << ", " << kdnodes[i]->getPoint()->getY() << ")" << endl;
         }
 
-    #endif
+    #endif*/
     #ifndef NDEBUG
     cerr << "numero ancore:" << n_anchors << endl;
     cerr << "numero pti:" << n_pti << endl;
@@ -125,17 +125,17 @@ void solve(std::vector<Anchor>& anchors){
         int idcurr = pti[i].id;
 
         #ifndef NDEBUG
-        if(i==n_pti*c/100){
+        if((i+1)==n_pti*c/10){
             c++;
             cerr << "Progress: " << (i*100)/n_pti << "%\n";
         }
         #endif
         if(pti[i].isBegin){
             
-            #ifndef NDEBUG
+            /*#ifndef NDEBUG
             cerr << "\nBEGIN"<< endl;
             cerr << "Processing point: (" << pti[i].x << ", " << pti[i].y << ") - id: " << idcurr << endl;
-            #endif
+            #endif*/
 
             KDpoint* p = tree.rmq(pti[i].x,pti[i].y ); 
 
@@ -159,12 +159,12 @@ void solve(std::vector<Anchor>& anchors){
                 //caso prima ancora fittizia
                 if(idPrec == 0){
                     anchors[idcurr].setScore(0);
-                    #ifndef NDEBUG
+                    /*#ifndef NDEBUG
                     cerr << "prima ancora fittizia (come predecessore), non calcolo gap cost" << endl;
                     cerr << "Best point found: (" << p->getX() << ", " << p->getY() << ") - id: " << idPrec << endl;
                     cerr << "peso di "<< anchors[idcurr].getId() << " : " << anchors[idcurr].getWeight() << endl;
                     cerr << "score di "<< anchors[idcurr].getId() << " : " << anchors[idcurr].getScore() << endl;
-                    #endif
+                    #endif*/
                     continue;
                 }
                 if(idcurr == n_anchors-1){
@@ -183,13 +183,12 @@ void solve(std::vector<Anchor>& anchors){
 
                 anchors[idcurr].setScore(prev.getScore()-gap);
 
-                #ifndef NDEBUG
+                /*#ifndef NDEBUG
                 cerr << "Updated anchor score: " << anchors[idcurr].getScore() << endl;
-                #endif
+                #endif*/
             }
             else {
                 #ifndef NDEBUG  
-                
                 cerr << "No valid predecessor found for anchor id: " << idcurr << ". Setting prec to -1 and score to 0." << endl;
                 #endif
                 anchors[idcurr].setPrec(-1);
@@ -204,11 +203,12 @@ void solve(std::vector<Anchor>& anchors){
                 continue; // Skip this iteration to avoid out-of-bounds access
             }
             if(idcurr==n_anchors-1){
-                #ifndef NDEBUG
-                cerr << "idcurr è l'ultima ancora fittizia, assegno stessa priorità della penultima ancora" << endl;
-                #endif
+                
                 kdpoints[idcurr]->setPriority(kdpoints[idPrec]->getPriority());
+                /*#ifndef NDEBUG
+                cerr << "idcurr è l'ultima ancora fittizia, assegno stessa priorità della penultima ancora" << endl;
                 cerr << "priority : " << kdpoints[idcurr]->getPriority() << endl;
+                #endif*/
                 continue;
             }
             if(kdpoints[idcurr] && kdnodes[idcurr]) {
@@ -238,6 +238,7 @@ void solve(std::vector<Anchor>& anchors){
 
     }
 
+    cerr << "priority:" << kdpoints[n_anchors-1]->getPriority() << endl;
     //tempi
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
