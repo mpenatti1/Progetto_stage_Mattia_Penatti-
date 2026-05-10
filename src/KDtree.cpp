@@ -139,7 +139,7 @@ void KDtree::reportSubtree(KDnode* v, KDpoint*& best) {
     if (!v) return;
 
     #ifdef USE_MAX_PRIORITY
-    if (v->getMaxPrioritySubtree() && best && v->getMaxPrioritySubtree()->getPoint()->getPriority() <= best->getPriority() ){
+    if (v->getMaxPrioritySubtree() && best && v->getMaxPrioritySubtreeValue() <= best->getPriority() ){
         #ifndef NDEBUG
         pruned_maxpriority+= countSubtreePriority(v);
         #endif
@@ -156,7 +156,7 @@ void KDtree::reportSubtree(KDnode* v, KDpoint*& best) {
     visited_nodes++;
     #endif
     if (v->getMaxPrioritySubtree() && 
-    (!best || best->getPriority() < v->getMaxPrioritySubtree()->getPoint()->getPriority())) {
+    (!best || best->getPriority() < v->getMaxPrioritySubtreeValue())) {
         best=v->getMaxPrioritySubtree()->getPoint();
     }
     /*
@@ -185,7 +185,7 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
     }
 
     #ifdef USE_MAX_PRIORITY
-    if (v->getMaxPrioritySubtree() && best && v->getMaxPrioritySubtree()->getPoint()->getPriority() <= best->getPriority() ){
+    if (v->getMaxPrioritySubtree() && best && v->getMaxPrioritySubtreeValue() <= best->getPriority() ){
         #ifndef NDEBUG
         pruned_maxpriority+= countSubtreePriority(v);
         #endif
@@ -215,7 +215,6 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
     int rightPriority = 
         right ? right->getMaxPrioritySubtreeValue() : std::numeric_limits<int>::min();
 
-    // funzione helper per visitare un figlio (evita duplicazione codice)
     if (leftPriority >= rightPriority){
 
         if (left){
