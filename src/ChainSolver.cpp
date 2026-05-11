@@ -54,7 +54,6 @@ void printChainRec(int id, const std::vector<Anchor>& anchors) {
         printChainRec(a.getPrec(), anchors);
     }
 
-    // skippa le fittizie nella stampa
     
         std::cout
             << a.getXbegin() << " "
@@ -86,7 +85,9 @@ void solve(std::vector<Anchor>& anchors){
     };
 
     Fenwick fw(ys.size());  
+    #ifndef NDEBUG
     cerr << "Compressione completata. Numero di y unici: " << ys.size() << endl;
+    #endif
     
     std::vector <PointLineSweep> pti= buildPti(anchors);
     
@@ -95,17 +96,22 @@ void solve(std::vector<Anchor>& anchors){
     int n_pti=pti.size();
     
     
-    
+    #ifndef NDEBUG
     cerr << "numero ancore:" << n_anchors << endl;
     cerr << "numero pti:" << n_pti << endl;
-    #
-    int c=1;
     cerr << "ys: ";
     for(auto y : ys) cerr << y << " ";
     cerr << endl;
+    #endif
+
+
+    int c=1;
+    
     for(int i=0;i< n_pti; i++){
 
         int idcurr = pti[i].id;
+
+        #ifndef NDEBUG
         cerr << "evento i=" << i 
          << " x=" << pti[i].x 
          << " y=" << pti[i].y
@@ -116,7 +122,7 @@ void solve(std::vector<Anchor>& anchors){
             c++;
             cerr << "Progress: " << (i*100)/n_pti << "%\n";
         }
-
+        #endif
         if(pti[i].isBegin){
 
             
@@ -148,7 +154,11 @@ void solve(std::vector<Anchor>& anchors){
         }
         else if(!pti[i].isBegin){
             
-            fw.update(getY(pti[i].y), anchors[idcurr].getScore(), idcurr);
+            int gap=
+                    (anchors[n_anchors-1].getXbegin() - anchors[idcurr].getXend()) + 
+                    (anchors[n_anchors-1].getYbegin() - anchors[idcurr].getYend());
+            int priority = anchors[idcurr].getScore() - gap;
+            fw.update(getY(pti[i].y), priority, idcurr);
         }
 
 
@@ -156,24 +166,21 @@ void solve(std::vector<Anchor>& anchors){
     
     int bestId = -1;
     int bestScore = std::numeric_limits<int>::min();
+
+    #ifndef NDEBUG
     for(int i = 0; i < anchors.size(); i++){
     cerr << "ancora " << i 
          << " score=" << anchors[i].getScore()
          << " prec=" << anchors[i].getPrec() << endl;
 }
+    #endif
 
-
-    for (int i = 0; i < anchors.size(); i++) {
-        if (anchors[i].getScore() > bestScore) {
-            bestScore = anchors[i].getScore();
-            bestId = i;
-        }
-    }
+    
     int lastId = anchors.size() - 1;
     cout << "x_begin y_begin x_end y_end weight\n";
     printChainRec(lastId, anchors);
     cout << "Score totale: " << anchors[lastId].getScore() << endl;
-
+    cerr << "Catena stampata. Score totale: " << anchors[lastId].getScore() << endl;
     
 
     
