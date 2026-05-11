@@ -46,21 +46,23 @@ vector <PointLineSweep> buildPti(const vector<Anchor>& anchors){
 void printChainRec(int id, const std::vector<Anchor>& anchors) {
 
     if (id == -1) return;
+    if (id == 0) return;  // stoppa alla fittizia iniziale
 
     const Anchor& a = anchors[id];
 
-    // prima vai indietro nella catena
     if (a.getPrec() != -1) {
         printChainRec(a.getPrec(), anchors);
     }
 
-    // poi stampa il nodo corrente
-    std::cout
-        << a.getXbegin() << " "
-        << a.getYbegin() << " "
-        << a.getXend()   << " "
-        << a.getYend()   << " "
-        << a.getWeight() << "\n";
+    // skippa le fittizie nella stampa
+    
+        std::cout
+            << a.getXbegin() << " "
+            << a.getYbegin() << " "
+            << a.getXend()   << " "
+            << a.getYend()   << " "
+            << a.getWeight() << "\n";
+    
 }
 
 std::vector<int> compression(std::vector<Anchor>& anchors){
@@ -109,6 +111,7 @@ void solve(std::vector<Anchor>& anchors){
          << " y=" << pti[i].y
          << " isBegin=" << pti[i].isBegin 
          << " id=" << idcurr << endl;
+
         if(i==n_pti*c/100){
             c++;
             cerr << "Progress: " << (i*100)/n_pti << "%\n";
@@ -119,6 +122,7 @@ void solve(std::vector<Anchor>& anchors){
             
             FenwickNode res = fw.query(getY(pti[i].y));
             int idPrec = res.bestId;
+
             if(idPrec == -1){
                 anchors[idcurr].setPrec(-1);
                 anchors[idcurr].setScore(0);
@@ -126,6 +130,10 @@ void solve(std::vector<Anchor>& anchors){
             else if(idPrec == 0){
                 anchors[idcurr].setPrec(0);
                 anchors[idcurr].setScore(0);
+            }
+            else if(idcurr == n_anchors-1){
+                anchors[idcurr].setPrec(idPrec);
+                anchors[idcurr].setScore(anchors[idPrec].getScore());
             }
             else{
 
@@ -139,7 +147,7 @@ void solve(std::vector<Anchor>& anchors){
 
         }
         else if(!pti[i].isBegin){
-
+            
             fw.update(getY(pti[i].y), anchors[idcurr].getScore(), idcurr);
         }
 
@@ -161,9 +169,10 @@ void solve(std::vector<Anchor>& anchors){
             bestId = i;
         }
     }
+    int lastId = anchors.size() - 1;
     cout << "x_begin y_begin x_end y_end weight\n";
-    printChainRec(bestId, anchors);
-    //cout << "Score totale: " << anchors.back().getScore() << endl;
+    printChainRec(lastId, anchors);
+    cout << "Score totale: " << anchors[lastId].getScore() << endl;
 
     
 
