@@ -129,8 +129,11 @@ void solve(std::vector<Anchor>& anchors){
             FenwickNode res = fw.query(getY(pti[i].y));
             int idPrec = res.bestId;
 
-            
-            if(idPrec == 0){
+            if(idPrec == -1){
+                anchors[idcurr].setPrec(-1);
+                anchors[idcurr].setScore(anchors[idcurr].getWeight());
+            }
+            else if(idPrec == 0){
                 anchors[idcurr].setPrec(0);
                 anchors[idcurr].setScore(0);
             }
