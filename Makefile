@@ -1,6 +1,6 @@
 CXX = g++
 
-SRC = src/Main.cpp src/Anchor.cpp src/ChainSolver.cpp src/KDnode.cpp src/KDpoint.cpp src/KDtree.cpp src/ReadAnchors.cpp
+SRC = src/Main.cpp src/Anchor.cpp src/ChainSolver.cpp src/ReadAnchors.cpp src/Fenwick.cpp
 OBJDIR = build
 
 TARGET_BASE = maximalColinearChaining

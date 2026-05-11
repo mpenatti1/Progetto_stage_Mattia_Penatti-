@@ -1,9 +1,8 @@
 #pragma once
 #include <vector>
 #include "Anchor.h"
-#include "KDpoint.h"
-#include "KDnode.h"
-#include "KDtree.h"
+#include "Fenwick.h"
+
 
 struct PointLineSweep{
 
@@ -15,7 +14,7 @@ struct PointLineSweep{
 
     
 void solve(std::vector<Anchor>& anchors);
-std::vector<KDpoint*> buildkdPoints(const std::vector<Anchor>& anchors);
-std::vector<KDnode*> buildkdNodes(const std::vector<KDpoint*>& kdpoints);
+
+std::vector<int>compression(std::vector<Anchor>& anchors);
 std::vector<PointLineSweep> buildPti(const std::vector<Anchor>& anchors);
 void printChainRec(Anchor & a, std::vector<Anchor> & anchors);
