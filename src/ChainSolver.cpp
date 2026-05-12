@@ -7,6 +7,7 @@ using namespace std;
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <chrono>
 
 
 vector<KDpoint*> buildkdPoints(const vector<Anchor>& anchors){
@@ -116,14 +117,13 @@ void solve(std::vector<Anchor>& anchors){
     #endif
     int c=1;
     int idPrec;
+
+    auto start = std::chrono::high_resolution_clock::now();
     for(int i=0;i< n_pti; i++){
 
         int idcurr = pti[i].id;
-
-        if(i==n_pti*c/100){
-            c++;
-            cerr << "Progress: " << (i*100)/n_pti << "%\n";
-        }
+        
+        
         if(pti[i].isBegin){
             
             #ifndef NDEBUG
@@ -231,7 +231,9 @@ void solve(std::vector<Anchor>& anchors){
 
 
     }
-
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    cerr << "Tempo di esecuzione: " << duration.count() << " ms" << endl;
     #ifndef NDEBUG
     tree.printAlbero();
     cerr << "valori precedent:\n";
