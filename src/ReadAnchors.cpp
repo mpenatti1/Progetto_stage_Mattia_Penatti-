@@ -41,8 +41,8 @@ vector <Anchor> readAnchors(){
 
     //ancora end
         
-    anchors.insert(anchors.end(),Anchor(max_x+ 1, max_y + 1,
-                            max_x + 1, max_y + 1,
+    anchors.insert(anchors.end(),Anchor(max_x+ 1, max_x + 1,
+                            max_y + 1, max_y + 1,
                             0, anchors.size()) );
     
     //fin.close();

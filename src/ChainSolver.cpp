@@ -106,7 +106,7 @@ void solve(std::vector<Anchor>& anchors){
 
 
     int c=1;
-    
+    int idPrec,priority_last;
     auto start = chrono::high_resolution_clock::now();
     for(int i=0;i< n_pti; i++){
 
@@ -128,7 +128,7 @@ void solve(std::vector<Anchor>& anchors){
 
             
             FenwickNode res = fw.query(getY(pti[i].y));
-            int idPrec = res.bestId;
+            idPrec = res.bestId;
 
             if(idPrec == -1){
                 anchors[idcurr].setPrec(-1);
@@ -155,6 +155,17 @@ void solve(std::vector<Anchor>& anchors){
         }
         else if(!pti[i].isBegin){
             
+            //per l ultima ancora ricalcolo la stessa priority del suo predecessore
+            if(idcurr == n_anchors-1){
+                cout << "idPrec: " << idPrec << endl;
+                int gap=
+                    (anchors[n_anchors-1].getXbegin() - anchors[idPrec].getXend()) + 
+                    (anchors[n_anchors-1].getYbegin() - anchors[idPrec].getYend());
+                priority_last = anchors[idPrec].getScore() - gap;
+                cout << "priority_last: " << priority_last << endl;
+                fw.update(getY(pti[i].y), priority_last, idcurr);
+            }
+
             int gap=
                     (anchors[n_anchors-1].getXbegin() - anchors[idcurr].getXend()) + 
                     (anchors[n_anchors-1].getYbegin() - anchors[idcurr].getYend());
@@ -182,6 +193,7 @@ void solve(std::vector<Anchor>& anchors){
     int lastId = anchors.size() - 1;
     cout << "x_begin y_begin x_end y_end weight\n";
     printChainRec(lastId, anchors);
+    cout << "priority : " << priority_last << endl;
     cout << "Score totale: " << anchors[lastId].getScore() << endl;
     cerr << "Catena stampata. Score totale: " << anchors[lastId].getScore() << endl;
     
