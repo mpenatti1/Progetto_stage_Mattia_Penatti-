@@ -106,7 +106,7 @@ void solve(std::vector<Anchor>& anchors){
 
 
     int c=1;
-    int idPrec,priority_last;
+    int idPrec,priority_last=-1;
     auto start = chrono::high_resolution_clock::now();
     for(int i=0;i< n_pti; i++){
 
@@ -193,7 +193,7 @@ void solve(std::vector<Anchor>& anchors){
     int lastId = anchors.size() - 1;
     cout << "x_begin y_begin x_end y_end weight\n";
     printChainRec(lastId, anchors);
-    cout << "priority : " << priority_last << endl;
+    cout << "priority_last: " << priority_last << endl;
     cout << "Score totale: " << anchors[lastId].getScore() << endl;
     cerr << "Catena stampata. Score totale: " << anchors[lastId].getScore() << endl;
     
