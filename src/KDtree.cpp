@@ -333,9 +333,9 @@ void KDtree::updateMaxPriority(KDnode* node) {
         }
 
         #ifndef NDEBUG
-            if (node->isActive()) {
-                //std::cerr << "Updated max priority for node with point (" << node->getPoint()->getX() << "," << node->getPoint()->getY() << ") with priority : " << node->getPoint()->getPriority() << " to: " << maxPriority << std::endl;
-            }
+            
+                std::cerr << "Updated max priority for node with point (" << node->getPoint()->getX() << "," << node->getPoint()->getY() << ") with priority : " << node->getPoint()->getPriority() << " to: " << maxPriority << std::endl;
+            
         #endif
 
         node->setMaxPrioritySubtree(best);

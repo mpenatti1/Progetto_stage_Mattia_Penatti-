@@ -132,10 +132,10 @@ void solve(std::vector<Anchor>& anchors){
         #endif
         if(pti[i].isBegin){
             
-            /*#ifndef NDEBUG
+            #ifndef NDEBUG
             cerr << "\nBEGIN"<< endl;
             cerr << "Processing point: (" << pti[i].x << ", " << pti[i].y << ") - id: " << idcurr << endl;
-            #endif*/
+            #endif
 
             KDpoint* p = tree.rmq(pti[i].x,pti[i].y ); 
 
@@ -183,9 +183,9 @@ void solve(std::vector<Anchor>& anchors){
 
                 anchors[idcurr].setScore(prev.getScore()-gap);
 
-                /*#ifndef NDEBUG
+                #ifndef NDEBUG
                 cerr << "Updated anchor score: " << anchors[idcurr].getScore() << endl;
-                #endif*/
+                #endif
             }
             else {
                 #ifndef NDEBUG  
@@ -225,6 +225,8 @@ void solve(std::vector<Anchor>& anchors){
             #ifndef NDEBUG
             cerr << "\nEND"<< endl;
             cerr << "Processing point: (" << pti[i].x << ", " << pti[i].y << ") - id: " << idcurr << endl;
+            cerr << "ultima ancora" << pti[n_pti-1].x << " " << pti[n_pti-1].y << endl;
+            cerr << "gc : " << kdpoints[idcurr]->getGc() << endl;
             cerr << "priority : " << kdpoints[idcurr]->getPriority() << endl;
             
             #endif
