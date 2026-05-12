@@ -4,7 +4,7 @@ using namespace std;
 #include <algorithm>
 #include <iostream>
 #include <fstream>
-
+#include <chrono>
 
 
 
@@ -107,6 +107,7 @@ void solve(std::vector<Anchor>& anchors){
 
     int c=1;
     
+    auto start = chrono::high_resolution_clock::now();
     for(int i=0;i< n_pti; i++){
 
         int idcurr = pti[i].id;
@@ -164,8 +165,10 @@ void solve(std::vector<Anchor>& anchors){
 
     }
     
-    int bestId = -1;
-    int bestScore = std::numeric_limits<int>::min();
+    auto end = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+    cerr << "Tempo di esecuzione: " << duration << " ms\n";
+    
 
     #ifndef NDEBUG
     for(int i = 0; i < anchors.size(); i++){
