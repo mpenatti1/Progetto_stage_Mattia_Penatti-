@@ -5,6 +5,8 @@ out/
 test/
 test_reali/
 risultati/
+risultati_base/
+
 
 maximalColinearChaining
 maximalColinearChaining_opt
