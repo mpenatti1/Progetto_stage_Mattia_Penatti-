@@ -1,7 +1,7 @@
 #include "KDnode.h"
 
 KDnode::KDnode(KDpoint* p) : point(p), left(nullptr), right(nullptr), parent(nullptr), axis(0), active(false) {
-    region = { p->getX(), p->getX(), p->getY(), p->getY() };
+    region = { p->getY(), p->getY() };
 }
 
 bool KDnode::isActive() const { return active; }
@@ -12,7 +12,6 @@ KDnode* KDnode::getLeft() const { return left; }
 KDnode* KDnode::getRight() const { return right; }
 KDnode* KDnode::getParent() const { return parent; }
 
-void KDnode::setAsse(int a) { axis = a; }
 void KDnode::activate() { active = true; }
 
 void KDnode::setLeft(KDnode* l) { left = l; }
