@@ -3,7 +3,7 @@
 #include "KDpoint.h"
 
 struct Box {
-    int xmin, xmax, ymin, ymax;
+    int ymin, ymax;
 };
 
 class KDnode {
@@ -30,7 +30,7 @@ public:
     KDnode* getLeft() const;
     KDnode* getRight() const;
 
-    void setAsse(int a);
+  
     void setLeft(KDnode* l);
     void setRight(KDnode* r);
 
