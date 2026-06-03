@@ -6,6 +6,9 @@ test/
 test_reali/
 risultati/
 risultati_nuovi/
+risultati_nuovo/
+risultati_base/
+risultati_fenwick/
 
 maximalColinearChaining
 maximalColinearChaining_opt

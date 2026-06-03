@@ -241,6 +241,7 @@ void solve(std::vector<Anchor>& anchors){
     }
 
     cerr << "priority:" << kdpoints[n_anchors-1]->getPriority() << endl;
+    cerr << "score:" << anchors[n_anchors-1].getScore() << endl;
     //tempi
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
