@@ -28,6 +28,7 @@ KDnode* KDtree::buildTree(std::vector<KDnode*>& p, int left, int right, int dept
 
     if(left==right){
 
+       
         KDnode* node=p[left];
         KDpoint* pt = node->getPoint();
         int axis = depth % 2;
@@ -35,6 +36,11 @@ KDnode* KDtree::buildTree(std::vector<KDnode*>& p, int left, int right, int dept
         Box b;
         b.xmin = b.xmax = pt->getX();
         b.ymin = b.ymax = pt->getY();
+
+        #ifndef NDEBUG
+            node->subtreeSize = 1;
+        #endif
+
         #ifdef USE_MAX_PRIORITY
         node->setMaxPrioritySubtree(std::numeric_limits<int>::min());
         #endif
@@ -80,6 +86,9 @@ KDnode* KDtree::buildTree(std::vector<KDnode*>& p, int left, int right, int dept
     if (L) L->setParent(node);
     if (R) R->setParent(node);
     
+    #ifndef NDEBUG
+    node->subtreeSize = 1 + (L ? L->subtreeSize : 0) + (R ? R->subtreeSize : 0);
+    #endif
 
     //bounding box
     Box b;
@@ -117,6 +126,7 @@ KDnode* KDtree::buildTree(std::vector<KDnode*>& p, int left, int right, int dept
     #endif
     node->setRegion(b);
 
+
     return node;
 }
 
@@ -141,7 +151,7 @@ void KDtree::reportSubtree(KDnode* v, KDpoint*& best) {
     #ifdef USE_MAX_PRIORITY
     if (best && v->getMaxPrioritySubtree() <= best->getPriority()){
         #ifndef NDEBUG
-        pruned_maxpriority+= countSubtreePriority(v);
+        pruned_maxpriority+= v->subtreeSize;
         #endif
         return;
 }
@@ -171,7 +181,7 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
     //pruning globale
     if (!intersects(v->getRegion(), R)){
         #ifndef NDEBUG
-        pruned_nodes+= countSubtree(v);
+        pruned_nodes+=v->subtreeSize;
         #endif
         return;
     }
@@ -179,7 +189,7 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
     #ifdef USE_MAX_PRIORITY
     if (best && v->getMaxPrioritySubtree() <= best->getPriority()){
         #ifndef NDEBUG
-        pruned_maxpriority+= countSubtreePriority(v);
+        pruned_maxpriority+= v->subtreeSize;
         #endif
         return;
 }
@@ -210,7 +220,7 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
             rmqRec(v->getLeft(), R, best);
         }
         #ifndef NDEBUG
-        else pruned_nodes+= countSubtree(v->getLeft());
+        else pruned_nodes+=v->getLeft()->subtreeSize;
         #endif
     }
 
@@ -225,12 +235,12 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
             rmqRec(v->getRight(), R, best);
         }
         #ifndef NDEBUG
-        else pruned_nodes+= countSubtree(v->getRight());
+        else pruned_nodes+=v->getRight()->subtreeSize;
         #endif
     }
 }
 
-KDpoint* KDtree::rmq(int xmax,int ymax) {
+KDpoint* KDtree::rmq(int xmax,int ymax,bool debug) {
 
     pruned_maxpriority=0;
     pruned_nodes=0;
@@ -242,9 +252,11 @@ KDpoint* KDtree::rmq(int xmax,int ymax) {
     rmqRec(root, R, best);
 
     #ifndef NDEBUG
-    std::cerr << "PRUNED MAXPRIORITY: " << pruned_maxpriority << "\n";
-    std::cerr << "PRUNED NODES: " << pruned_nodes << "\n";
-    std::cerr << "VISITED NODES: " << visited_nodes << "\n";
+    if(debug){
+        std::cerr << "PRUNED MAXPRIORITY: " << pruned_maxpriority << "\n";
+        std::cerr << "PRUNED NODES: " << pruned_nodes << "\n";
+        std::cerr << "VISITED NODES: " << visited_nodes << "\n";
+    }
     #endif
     return best;
 }
@@ -266,12 +278,12 @@ void KDtree::updateMaxPriority(KDnode* node) {
     if (node->getRight())
         maxPriority = std::max(maxPriority, node->getRight()->getMaxPrioritySubtree());
 
-    #ifndef NDEBUG
+    /*#ifndef NDEBUG
 
         if (node->isActive()) {
             std::cerr << "Updated max priority for node with point (" << node->getPoint()->getX() << "," << node->getPoint()->getY() << ") with priority : " << node->getPoint()->getPriority() << " to: " << maxPriority << std::endl;
         }
-    #endif
+    #endif*/
 
     node->setMaxPrioritySubtree(maxPriority);
 
@@ -301,6 +313,7 @@ void KDtree::printAlbero() { printGraph(root, 0); }
 
 KDtree::KDtree(std::vector<KDnode*> points) {
     root = buildTree(points, 0, points.size() - 1, 0);
+    std::cerr << root->subtreeSize << std::endl;
 }
 
 void KDtree::destroy(KDnode* node) {

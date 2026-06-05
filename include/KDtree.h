@@ -47,7 +47,7 @@ public:
     KDtree(std::vector<KDnode*> points);
     ~KDtree();
 
-    KDpoint* rmq(int xmax,int ymax);
+    KDpoint* rmq(int xmax,int ymax,bool debug);
 
     #ifdef USE_MAX_PRIORITY
     void updateMaxPriority(KDnode* node);

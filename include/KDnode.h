@@ -18,7 +18,8 @@ private:
     Box region;  
 
     KDnode* parent;
-    int maxPrioritySubtree;      
+    int maxPrioritySubtree;  
+    
 public:
 
     KDnode(KDpoint* p);
@@ -44,6 +45,8 @@ public:
 
     Box getRegion() const;  
     int getMaxPrioritySubtree() const;
-    ~KDnode() {
-}
+    #ifndef NDEBUG
+        int subtreeSize; // For debugging purposes, to identify the node
+    #endif    
+    ~KDnode() {}
 };
