@@ -21,7 +21,7 @@ private:
     int maxPrioritySubtree;  
     
 public:
-
+    
     KDnode(KDpoint* p);
 
     bool isActive() const;

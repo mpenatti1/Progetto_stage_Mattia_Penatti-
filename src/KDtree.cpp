@@ -130,19 +130,7 @@ KDnode* KDtree::buildTree(std::vector<KDnode*>& p, int left, int right, int dept
     return node;
 }
 
-///////////////////
-    #ifndef NDEBUG
-    int KDtree::countSubtree(KDnode* node) {
-        if (!node) return 0;
-        return 1 + countSubtree(node->getLeft()) + countSubtree(node->getRight());
-}
-    int KDtree::countSubtreePriority(KDnode* node) {
-        if (!node) return 0;
-        return 1 + countSubtreePriority(node->getLeft()) + countSubtreePriority(node->getRight());
-}
-    #endif
 
-//////////////////
 
 
 void KDtree::reportSubtree(KDnode* v, KDpoint*& best) {
@@ -241,10 +229,11 @@ void KDtree::rmqRec(KDnode* v, Range& R, KDpoint*& best) {
 }
 
 KDpoint* KDtree::rmq(int xmax,int ymax,bool debug) {
-
+    #ifndef NDEBUG
     pruned_maxpriority=0;
     pruned_nodes=0;
     visited_nodes=0;
+    #endif
     Range R{0,xmax,0, ymax};
 
     KDpoint* best = nullptr;
@@ -313,7 +302,7 @@ void KDtree::printAlbero() { printGraph(root, 0); }
 
 KDtree::KDtree(std::vector<KDnode*> points) {
     root = buildTree(points, 0, points.size() - 1, 0);
-    std::cerr << root->subtreeSize << std::endl;
+    
 }
 
 void KDtree::destroy(KDnode* node) {

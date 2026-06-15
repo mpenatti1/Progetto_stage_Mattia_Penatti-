@@ -9,11 +9,13 @@ using namespace std;
 #include <fstream>
 #include <chrono>
 
+#include <unordered_set>
 
 vector<KDpoint*> buildkdPoints(const vector<Anchor>& anchors){
 
     vector<KDpoint*> kdpoints;
-    
+    kdpoints.reserve(anchors.size());
+
     for (int i=0;i<anchors.size();i++){
 
         KDpoint * kd =new KDpoint(
@@ -33,7 +35,7 @@ vector<KDpoint*> buildkdPoints(const vector<Anchor>& anchors){
 vector <KDnode*> buildkdNodes(const vector<KDpoint*>& kdpoints){
     
     vector<KDnode*> kdnodes;
-
+    kdnodes.reserve(kdpoints.size());
     for(int i=0;i<kdpoints.size();i++){
 
         KDnode* node = new KDnode(kdpoints[i]);
@@ -46,7 +48,7 @@ vector <KDnode*> buildkdNodes(const vector<KDpoint*>& kdpoints){
 vector <PointLineSweep> buildPti(const vector<Anchor>& anchors){
 
     vector<PointLineSweep> pti;
-
+    pti.reserve(2*anchors.size());
     for(int i=0;i<anchors.size();i++){
 
         //begin
@@ -87,7 +89,28 @@ void printChainRec(Anchor & a, std::vector<Anchor> & anchors) {
     
 }
 
+/////////////////////////////////////////
+void printChaindebug(const vector<Anchor>& anchors) {
 
+    vector<int> chain;
+    int curr = anchors.back().getId();
+
+    while (curr != -1) {
+        chain.push_back(curr);
+        curr = anchors[curr].getPrec();
+    }
+
+    for (auto it = chain.rbegin(); it != chain.rend(); ++it) {
+        const auto& a = anchors[*it];
+        cout << a.getXbegin() << " "
+             << a.getYbegin() << " "
+             << a.getXend() << " "
+             << a.getYend() << " "
+             << a.getWeight() << "\n";
+    }
+}
+
+//////////////////////////
 
 void solve(std::vector<Anchor>& anchors){
     
@@ -119,7 +142,7 @@ void solve(std::vector<Anchor>& anchors){
     cerr << "numero pti:" << n_pti << endl;
     #endif*/
     int c=1;
-    int idPrec;
+    int idPrec=0;
     bool debug=false;
     int nextPercent=9;
     auto start = std::chrono::high_resolution_clock::now();
@@ -135,21 +158,23 @@ void solve(std::vector<Anchor>& anchors){
             cerr << "Processing point: (" << pti[i].x << ", " << pti[i].y << ") - id: " << idcurr << endl;
             #endif*/
 
-            
+            #ifndef NDEBUG
             if (i >= n_pti * nextPercent / 100) {
                 cerr << nextPercent << "'%' completato\n";
                 debug = true;
                 nextPercent += 10;
             }
+
             else {
                 debug=false;
             } 
-            
+            #endif
             KDpoint* p = tree.rmq(pti[i].x,pti[i].y,debug);
             if(p != nullptr) {
 
                 idPrec = p->getId();
             
+                
                 if (idPrec <0 || idPrec >= anchors.size() || idcurr < 0 || idcurr >= anchors.size()) {
                     cerr << "Error: idPrec or idcurr out of bounds. idPrec: " << idPrec << ", idcurr: " << idcurr << endl;
                     continue; // Skip this iteration to avoid out-of-bounds access
@@ -195,10 +220,9 @@ void solve(std::vector<Anchor>& anchors){
                 #endif*/
             }
             else {
-                
-                
+                #ifndef NDEBUG
                 cerr << "No valid predecessor found for anchor id: " << idcurr << ". Setting prec to -1 and score to 0." << endl;
-                
+                #endif
                 anchors[idcurr].setPrec(-1);
                 anchors[idcurr].setScore(0);
             }
@@ -244,6 +268,7 @@ void solve(std::vector<Anchor>& anchors){
 
 
     }
+    cerr << "Sweep line completed. Constructing optimal chain...\n";
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     cerr << "Tempo di esecuzione: " << duration.count() << " ms" << endl;
@@ -261,11 +286,13 @@ void solve(std::vector<Anchor>& anchors){
     #endif
     */
 
+
+    cout << "Score totale: " << anchors.back().getScore() << endl;
+    cerr << "anchors size" << anchors.size() << endl;
     cout << "x_begin y_begin x_end y_end weight\n";
-    printChainRec(anchors.back(), anchors);
+    printChaindebug(anchors);
     cout << "Score totale: " << anchors.back().getScore() << endl;
 
-    
     //distruggo kdpoints
     for (auto p : kdpoints)
     delete p;
