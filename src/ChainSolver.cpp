@@ -12,7 +12,7 @@ using namespace std;
 vector <PointLineSweep> buildPti(const vector<Anchor>& anchors){
 
     vector<PointLineSweep> pti;
-
+    pti.reserve(2*anchors.size());
     for(int i=0;i<anchors.size();i++){
 
         //begin
@@ -57,8 +57,8 @@ void printChainRec(int id, const std::vector<Anchor>& anchors) {
     
         std::cout
             << a.getXbegin() << " "
-            << a.getYbegin() << " "
             << a.getXend()   << " "
+            << a.getYbegin() << " "
             << a.getYend()   << " "
             << a.getWeight() << "\n";
     
@@ -76,9 +76,22 @@ std::vector<int> compression(std::vector<Anchor>& anchors){
     return ys;
 }
 
+////////////
+std::vector<Anchor> ancoreGrafico(std::vector<Anchor>& anchors){
+    
+    std::sort(anchors.begin(), anchors.end(),
+          [](const Anchor& a, const Anchor& b) {
+              return a.getXbegin() < b.getXbegin();
+          });
+
+    return std::vector<Anchor>(anchors.begin()+500500, anchors.begin() + 501000);
+}
+///////////
+
 void solve(std::vector<Anchor>& anchors){
     
-    
+    //anchors= ancoreGrafico(anchors);
+
     auto ys = compression(anchors);
     auto getY = [&](int y){
         return (int)(upper_bound(ys.begin(), ys.end(), y) - ys.begin());
@@ -189,7 +202,16 @@ void solve(std::vector<Anchor>& anchors){
 }
     #endif
 
-    
+    for (int i=0; i < anchors.size(); i++) {
+        
+        cerr << anchors[i].getXbegin() << " "
+             << anchors[i].getYbegin() << " "
+             << anchors[i].getXend()   << " "
+             << anchors[i].getYend()   << " "
+             << anchors[i].getWeight() << "\n"
+             ;
+}
+
     int lastId = anchors.size() - 1;
     cout << "x_begin y_begin x_end y_end weight\n";
     printChainRec(lastId, anchors);
