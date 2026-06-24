@@ -103,8 +103,8 @@ void printChaindebug(const vector<Anchor>& anchors) {
     for (auto it = chain.rbegin(); it != chain.rend(); ++it) {
         const auto& a = anchors[*it];
         cout << a.getXbegin() << " "
-             << a.getYbegin() << " "
              << a.getXend() << " "
+             << a.getYbegin() << " "
              << a.getYend() << " "
              << a.getWeight() << "\n";
     }
