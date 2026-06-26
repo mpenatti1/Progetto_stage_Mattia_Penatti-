@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 vector <Anchor> readAnchors(){
@@ -46,6 +47,10 @@ vector <Anchor> readAnchors(){
                             0, anchors.size()) );
     
     //fin.close();
+
+    std::sort(anchors.begin(),anchors.end(),[](const Anchor& a, const Anchor& b){
+        return a.getXend()<b.getXend();
+    });
 
     return anchors;
 }

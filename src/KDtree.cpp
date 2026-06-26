@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <limits>
-
+#include <chrono>
 //VERSIONE BASE
 
 bool fullyInside(const Box& a, const Range& R) {
@@ -238,8 +238,11 @@ KDpoint* KDtree::rmq(int xmax,int ymax,bool debug) {
 
     KDpoint* best = nullptr;
 
+    auto start = std::chrono::high_resolution_clock::now();
     rmqRec(root, R, best);
-
+    auto end = std::chrono::high_resolution_clock::now();
+    total_rmq += std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    
     #ifndef NDEBUG
     if(debug){
         std::cerr << "PRUNED MAXPRIORITY: " << pruned_maxpriority << "\n";

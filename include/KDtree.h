@@ -41,6 +41,7 @@ private:
     ///////
     int countSubtree(KDnode* node);
     int countSubtreePriority(KDnode* node);
+    
     ///////
 public:
 
@@ -56,4 +57,5 @@ public:
     void printAlbero();
 
     KDnode* getRoot();
+    double total_rmq = 0.00; // Total time spent in rmqRec
 };

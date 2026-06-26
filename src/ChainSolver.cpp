@@ -26,7 +26,6 @@ vector<KDpoint*> buildkdPoints(const vector<Anchor>& anchors){
                 
         );
         kdpoints.push_back(kd); //vettore kdpoints per costruzione albero
-        
     }
 
     return kdpoints;
@@ -286,7 +285,7 @@ void solve(std::vector<Anchor>& anchors){
     #endif
     */
 
-
+    cerr << "tempo rmq:" << tree.total_rmq << " microseconds" << endl;
     cout << "Score totale: " << anchors.back().getScore() << endl;
     cerr << "anchors size" << anchors.size() << endl;
     cout << "x_begin y_begin x_end y_end weight\n";
